@@ -459,6 +459,9 @@ textarea.inp{resize:vertical;min-height:80px;line-height:1.5}
 .auth-back{display:block;text-align:center;margin-top:18px;font-size:13px;color:var(--ink-soft);cursor:pointer}
 .auth-back:hover{color:var(--ink)}
 
+.pay-wait{display:flex;align-items:center;gap:9px;margin-top:16px;color:var(--ink-soft);text-transform:none;letter-spacing:.04em;font-size:12px}
+.pdot{width:9px;height:9px;border-radius:50%;background:var(--accent);animation:pdot 1.2s ease-in-out infinite}
+@keyframes pdot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.7)}}
 .leads-list{display:flex;flex-direction:column;gap:14px;max-width:720px}
 .lead-card{background:var(--surface);border:1.5px solid var(--line-strong);border-radius:10px;padding:20px 22px}
 .lead-top{display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-size:16px}
@@ -802,7 +805,9 @@ const PLANS=[
   {id:'pro15',name:'Profissional',price:32.9,limit:15,photos:30,popular:true,feats:['Até 15 imóveis','Catálogo online','Link compartilhável','1 vídeo + 30 fotos por imóvel']},
   {id:'unlimited',name:'Ilimitado',price:49.9,limit:Infinity,photos:Infinity,feats:['Imóveis ilimitados','Catálogo online','Link compartilhável','Vídeos e fotos ilimitados','Suporte']},
 ];
-function planOf(u){return PLANS.find(p=>p.id===((u&&u.plan)||'free'))||PLANS[0];}
+function planOf(u){const id=(u&&u.plan)||'free';
+  if(id!=='free'&&u&&u.paid_until&&new Date(u.paid_until)<new Date())return PLANS[0];
+  return PLANS.find(p=>p.id===id)||PLANS[0];}
 function planLimit(u){return planOf(u).limit;}
 function canAdd(){return state.properties.length<planLimit(state.user);}
 
@@ -930,9 +935,9 @@ function renderPlans(){
   <section class="view">
     <div class="cover-kicker" style="margin-top:46px"><span class="lead mono"><span class="sq"></span>Planos & cobrança</span><span class="ln"></span><button class="mono" data-act="go-catalog" style="cursor:pointer">${I.back?'':''}← Voltar</button></div>
     <h1 class="disp" style="font-size:clamp(30px,5.5vw,54px);margin:8px 0 10px">Escolha seu plano</h1>
-    <p class="muted" style="max-width:62ch;margin:0">Você está usando <strong>${used}</strong> ${used===1?'imóvel':'imóveis'} no plano <strong>${cur.name}</strong>${cur.limit!==Infinity?` (limite de ${cur.limit})`:''}.</p>
+    <p class="muted" style="max-width:62ch;margin:0">Você está usando <strong>${used}</strong> ${used===1?'imóvel':'imóveis'} no plano <strong>${cur.name}</strong>${cur.limit!==Infinity?` (limite de ${cur.limit})`:''}${cur.id!=='free'&&u.paid_until?` · válido até ${new Date(u.paid_until).toLocaleDateString('pt-BR')}`:''}.</p>
     <div class="plans-grid">${PLANS.map(p=>planCard(p,u)).join('')}</div>
-    <p class="mono" style="text-transform:none;letter-spacing:.02em;color:var(--ink-faint);margin-top:26px;max-width:72ch">Pagamento ainda não conectado: escolher um plano o ativa em modo de teste. A cobrança real (Pix/cartão) é o próximo passo da integração.</p>
+    <p class="mono" style="text-transform:none;letter-spacing:.02em;color:var(--ink-faint);margin-top:26px;max-width:72ch">Pagamento via Pix. A ativação é automática assim que o pagamento é confirmado.</p>
   </section>`;
   observeReveals();
 }
@@ -953,11 +958,48 @@ function planCard(p,u){
   </article>`;
 }
 async function choosePlan(id){
-  const {error}=await sb.from('brokers').update({plan:id}).eq('id',state.user.id);
-  if(error){console.error(error);toast('Não foi possível alterar o plano agora.',false);return;}
-  state.user.plan=id;cacheBroker(state.user);
-  toast(`Plano ${(PLANS.find(p=>p.id===id)||{}).name} ativado.`);renderPlans();
+  if(id==='free'){
+    const {error}=await sb.from('brokers').update({plan:'free'}).eq('id',state.user.id);
+    if(error){console.error(error);toast('Não foi possível alterar o plano agora.',false);return;}
+    state.user.plan='free';cacheBroker(state.user);
+    toast('Plano Gratuito ativado.');renderPlans();return;
+  }
+  const btn=document.querySelector(`[data-act="choose-plan"][data-id="${id}"]`);
+  if(btn){btn.disabled=true;btn.textContent='Gerando Pix…';}
+  try{
+    const {data,error}=await sb.functions.invoke('pay',{body:{plan:id}});
+    if(error||!data||!data.brCode)throw (error||new Error(JSON.stringify(data)));
+    payModal(data,id);startPayPoll();
+  }catch(err){console.error(err);toast('Não foi possível gerar o Pix agora. Tente novamente.',false);}
+  if(btn){btn.disabled=false;btn.textContent='Assinar';}
 }
+function payModal(d,planId){const p=PLANS.find(x=>x.id===planId)||{};
+  openModal(`<div class="modal-head"><h3>Assinar plano ${esc(p.name||'')}</h3><button class="icon-btn" data-act="close-modal" style="width:34px;height:34px" aria-label="Fechar">✕</button></div>
+    <div class="modal-body" id="payBody">
+      <p class="muted" style="margin-top:0;font-size:14.5px">Pague <strong>R$ ${(d.amount/100).toFixed(2).replace('.',',')}</strong> pelo Pix abaixo. Vale por 31 dias e a ativação é automática, em segundos.</p>
+      <div style="display:flex;gap:18px;flex-wrap:wrap;align-items:center">
+        <img id="payQr" src="${d.brCodeBase64}" alt="QR Code Pix" width="182" height="182" style="background:#fff;padding:8px;border-radius:10px">
+        <div style="flex:1;min-width:220px">
+          <label style="font-size:12px;color:var(--ink-soft)">Ou copia e cola:</label>
+          <div style="display:flex;gap:8px;margin-top:6px"><input class="inp" id="brCode" value="${esc(d.brCode)}" readonly style="font-size:11px"><button class="btn btn-line" data-act="copy-brcode">Copiar</button></div>
+          <div class="pay-wait mono"><span class="pdot"></span>Aguardando pagamento…</div>
+          ${d.devMode?'<div class="mono" style="margin-top:10px;color:var(--spot);text-transform:none">Modo de teste (dev): nenhum valor real será cobrado.</div>':''}
+        </div>
+      </div>
+    </div>`);}
+let payPoll=null;
+function startPayPoll(){stopPayPoll();
+  payPoll=setInterval(async()=>{
+    if(!document.getElementById('payQr')){stopPayPoll();return;}
+    const {data}=await sb.from('brokers').select('plan,paid_until').eq('id',state.user.id).maybeSingle();
+    if(data&&data.plan&&data.plan!=='free'&&data.plan!==state.user.plan){
+      state.user.plan=data.plan;state.user.paid_until=data.paid_until;cacheBroker(state.user);
+      stopPayPoll();closeModal();
+      toast(`Pagamento confirmado! Plano ${planOf(state.user).name} ativado 🎉`);
+      if(state.route==='plans')renderPlans();else loadOwner();
+    }
+  },4000);}
+function stopPayPoll(){if(payPoll){clearInterval(payPoll);payPoll=null;}}
 /* ===================== LEADS ===================== */
 function leadModal(propId){const p=state.properties.find(x=>x.id===propId)||{};
   openModal(`<div class="modal-head"><h3>Tenho interesse</h3><button class="icon-btn" data-act="close-modal" style="width:34px;height:34px" aria-label="Fechar">✕</button></div>
@@ -1459,6 +1501,7 @@ document.addEventListener('click',e=>{
     case 'lead-send':sendLead(t.dataset.id);break;
     case 'lead-del':delLead(t.dataset.id);break;
     case 'choose-plan':choosePlan(t.dataset.id);break;
+    case 'copy-brcode':{const i=$('#brCode');i.select();navigator.clipboard.writeText(i.value).then(()=>toast('Código Pix copiado.')).catch(()=>{document.execCommand('copy');toast('Código Pix copiado.');});break;}
     case 'go-plans-modal':closeModal();navPlans();break;
     case 'nav-edit-profile':closeMenu();openProfileModal();break;
     case 'nav-logout':logout();break;
