@@ -459,6 +459,8 @@ textarea.inp{resize:vertical;min-height:80px;line-height:1.5}
 .auth-back{display:block;text-align:center;margin-top:18px;font-size:13px;color:var(--ink-soft);cursor:pointer}
 .auth-back:hover{color:var(--ink)}
 
+.sub-manage{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-top:24px;background:var(--surface);border:1.5px solid var(--line-strong);border-radius:10px;padding:16px 20px;font-size:14px;color:var(--ink-soft)}
+.sub-manage strong{color:var(--ink)}
 .menu-badge{display:inline-grid;place-items:center;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:var(--accent);color:var(--accent-ink);font-size:10.5px;font-weight:700;margin-left:auto}
 .lead-card.lead-new{border-color:var(--accent)}
 .lead-card.lead-new .lead-top strong::after{content:"NOVO";background:var(--accent);color:var(--accent-ink);font-size:9px;font-weight:800;letter-spacing:.08em;padding:2.5px 7px;border-radius:999px;margin-left:9px;vertical-align:2px}
@@ -998,7 +1000,10 @@ function renderPlans(){
     <h1 class="disp" style="font-size:clamp(30px,5.5vw,54px);margin:8px 0 10px">Escolha seu plano</h1>
     <p class="muted" style="max-width:62ch;margin:0">Você está usando <strong>${used}</strong> ${used===1?'imóvel':'imóveis'} no plano <strong>${cur.name}</strong>${cur.limit!==Infinity?` (limite de ${cur.limit})`:''}${cur.id!=='free'&&u.paid_until?` · válido até ${new Date(u.paid_until).toLocaleDateString('pt-BR')}`:''}.</p>
     <div class="plans-grid">${PLANS.map(p=>planCard(p,u)).join('')}</div>
-    <p class="mono" style="text-transform:none;letter-spacing:.02em;color:var(--ink-faint);margin-top:26px;max-width:72ch">Pagamento via Pix. A ativação é automática assim que o pagamento é confirmado.</p>
+    ${cur.id!=='free'?`<div class="sub-manage reveal">${u.sub_id
+      ?`<div><strong>Renovação automática ativa</strong> no cartão. Próxima cobrança renova seu plano sozinha.</div><button class="btn btn-line" data-act="sub-cancel">Cancelar renovação</button>`
+      :`<div>Seu acesso vale até <strong>${u.paid_until?new Date(u.paid_until).toLocaleDateString('pt-BR'):'—'}</strong> e <strong>não renova sozinho</strong>. Renove no Pix ou assine no cartão para renovar automaticamente.</div>`}</div>`:''}
+    <p class="mono" style="text-transform:none;letter-spacing:.02em;color:var(--ink-faint);margin-top:26px;max-width:72ch">Cartão: assinatura mensal com renovação automática (cancele quando quiser). Pix: acesso avulso de 31 dias. Upgrade pelo Pix desconta os dias não usados do plano atual.</p>
   </section>`;
   observeReveals();
 }
@@ -1008,7 +1013,9 @@ function planCard(p,u){
   const price=p.price?`<span class="cur">R$</span>${p.price.toFixed(2).replace('.',',').split(',')[0]}<span class="cents">,${p.price.toFixed(2).split('.')[1]}</span><span class="per">/mês</span>`:'Grátis';
   const tag=isCur?'<div class="plan-tag cur-tag mono">Seu plano</div>':(p.popular?'<div class="plan-tag mono">Mais popular</div>':'');
   const btn=isCur?`<button class="btn btn-ghost btn-block" disabled style="opacity:.65">Plano atual</button>`
-    :`<button class="btn ${p.popular?'btn-primary':'btn-line'} btn-block" data-act="choose-plan" data-id="${p.id}">${p.price?'Assinar':'Usar gratuito'}</button>`;
+    :(p.price?`<button class="btn ${p.popular?'btn-primary':'btn-line'} btn-block" data-act="sub-card" data-id="${p.id}">Assinar no cartão · renova sozinho</button>
+       <button class="btn btn-ghost btn-block" data-act="choose-plan" data-id="${p.id}" style="margin-top:8px">Pagar 1 mês no Pix</button>`
+      :`<button class="btn btn-line btn-block" data-act="choose-plan" data-id="${p.id}">Usar gratuito</button>`);
   return `<article class="plan-card reveal ${isCur?'current':''} ${p.popular?'popular':''}">
     ${tag}
     <div class="mono plan-name">${esc(p.name)}</div>
@@ -1018,26 +1025,55 @@ function planCard(p,u){
     ${btn}
   </article>`;
 }
+async function subCard(id){
+  const btn=document.querySelector(`[data-act="sub-card"][data-id="${id}"]`);
+  if(btn){btn.disabled=true;btn.textContent='Abrindo checkout…';}
+  try{
+    const {data,error}=await sb.functions.invoke('pay',{body:{plan:id,mode:'card'}});
+    if(error||!data||!data.url){
+      const msg=(data&&data.message)||'Não foi possível abrir o checkout. Tente novamente.';
+      toast(msg,false);throw (error||new Error('sem url'));
+    }
+    if(data.subId){state.user.sub_id=data.subId;cacheBroker(state.user);}
+    location.href=data.url;
+  }catch(err){console.error(err);}
+  if(btn){btn.disabled=false;btn.textContent='Assinar no cartão · renova sozinho';}
+}
+function subCancelModal(){
+  openModal(`<div class="modal-head"><h3>Cancelar renovação</h3><button class="icon-btn" data-act="close-modal" style="width:34px;height:34px" aria-label="Fechar">✕</button></div>
+    <div class="modal-body"><p style="margin-top:0;font-size:14.5px">A renovação automática será desligada. Seu plano <strong>continua ativo até ${state.user.paid_until?new Date(state.user.paid_until).toLocaleDateString('pt-BR'):'o fim do período pago'}</strong>; depois disso, sua conta volta ao Gratuito.</p></div>
+    <div class="modal-foot"><button class="btn btn-ghost" data-act="close-modal">Manter renovação</button><button class="btn btn-primary" data-act="sub-cancel-confirm">Cancelar renovação</button></div>`);}
+async function subCancel(){
+  const btn=document.querySelector('[data-act="sub-cancel-confirm"]');
+  if(btn){btn.disabled=true;btn.textContent='Cancelando…';}
+  const {data,error}=await sb.functions.invoke('sub-cancel',{body:{}});
+  if(error||(data&&data.error)){console.error(error||data);toast('Não foi possível cancelar agora. Tente novamente.',false);if(btn){btn.disabled=false;btn.textContent='Cancelar renovação';}return;}
+  state.user.sub_id=null;cacheBroker(state.user);
+  closeModal();toast(data&&data.noSub?'Nenhuma renovação automática ativa.':'Renovação cancelada. Seu acesso segue até o fim do período pago.');
+  renderPlans();
+}
 async function choosePlan(id){
   if(id==='free'){
+    if(state.user.sub_id){await sb.functions.invoke('sub-cancel',{body:{}}).catch(()=>{});state.user.sub_id=null;}
     const {error}=await sb.from('brokers').update({plan:'free'}).eq('id',state.user.id);
     if(error){console.error(error);toast('Não foi possível alterar o plano agora.',false);return;}
     state.user.plan='free';cacheBroker(state.user);
-    toast('Plano Gratuito ativado.');renderPlans();return;
+    toast('Plano Gratuito ativado. Renovação automática (se havia) foi cancelada.');renderPlans();return;
   }
   const btn=document.querySelector(`[data-act="choose-plan"][data-id="${id}"]`);
   if(btn){btn.disabled=true;btn.textContent='Gerando Pix…';}
   try{
-    const {data,error}=await sb.functions.invoke('pay',{body:{plan:id}});
+    const {data,error}=await sb.functions.invoke('pay',{body:{plan:id,mode:'pix'}});
+    if(data&&data.error==='downgrade'){toast(data.message||'Aguarde o vencimento do plano atual.',false);throw new Error('downgrade');}
     if(error||!data||!data.brCode)throw (error||new Error(JSON.stringify(data)));
     payModal(data,id);startPayPoll();
-  }catch(err){console.error(err);toast('Não foi possível gerar o Pix agora. Tente novamente.',false);}
+  }catch(err){if(String(err&&err.message)!=='downgrade'){console.error(err);toast('Não foi possível gerar o Pix agora. Tente novamente.',false);}}
   if(btn){btn.disabled=false;btn.textContent='Assinar';}
 }
 function payModal(d,planId){const p=PLANS.find(x=>x.id===planId)||{};
   openModal(`<div class="modal-head"><h3>Assinar plano ${esc(p.name||'')}</h3><button class="icon-btn" data-act="close-modal" style="width:34px;height:34px" aria-label="Fechar">✕</button></div>
     <div class="modal-body" id="payBody">
-      <p class="muted" style="margin-top:0;font-size:14.5px">Pague <strong>R$ ${(d.amount/100).toFixed(2).replace('.',',')}</strong> pelo Pix abaixo. Vale por 31 dias e a ativação é automática, em segundos.</p>
+      <p class="muted" style="margin-top:0;font-size:14.5px">Pague <strong>R$ ${(d.amount/100).toFixed(2).replace('.',',')}</strong> pelo Pix abaixo${d.note?` <span style="color:var(--accent-strong)">${esc(d.note)}</span>`:''}. Vale por 31 dias e a ativação é automática, em segundos.</p>
       <div style="display:flex;gap:18px;flex-wrap:wrap;align-items:center">
         <img id="payQr" src="${d.brCodeBase64}" alt="QR Code Pix" width="182" height="182" style="background:#fff;padding:8px;border-radius:10px">
         <div style="flex:1;min-width:220px">
@@ -1652,6 +1688,9 @@ document.addEventListener('click',e=>{
     case 'lead-del':delLead(t.dataset.id);break;
     case 'lead-status':setLeadStatus(t.dataset.id,t.dataset.st);break;
     case 'choose-plan':choosePlan(t.dataset.id);break;
+    case 'sub-card':subCard(t.dataset.id);break;
+    case 'sub-cancel':subCancelModal();break;
+    case 'sub-cancel-confirm':subCancel();break;
     case 'copy-brcode':{const i=$('#brCode');i.select();navigator.clipboard.writeText(i.value).then(()=>toast('Código Pix copiado.')).catch(()=>{document.execCommand('copy');toast('Código Pix copiado.');});break;}
     case 'go-plans-modal':closeModal();navPlans();break;
     case 'nav-edit-profile':closeMenu();openProfileModal();break;
