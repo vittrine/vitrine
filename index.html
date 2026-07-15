@@ -487,8 +487,13 @@ textarea.inp{resize:vertical;min-height:80px;line-height:1.5}
 .card-menu .st-on{color:var(--accent-strong)}
 .st-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:2px}
 .st-dot.st-disponivel{background:#41B06E}.st-dot.st-reservado{background:var(--spot)}.st-dot.st-vendido{background:#9B2E2E}
+.vid-tabs{display:flex;gap:8px;margin-bottom:12px}
+.vtab{padding:8px 15px;border-radius:999px;border:1.5px solid var(--line-strong);background:none;color:var(--ink-soft);font-size:11.5px;letter-spacing:.04em;cursor:pointer;transition:all .2s}
+.vtab.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.vid-current{font-size:12px;color:var(--ink-soft);margin-bottom:10px}
+.lnk{background:none;border:none;color:var(--accent-strong);cursor:pointer;text-decoration:underline;font:inherit;padding:0}
 .video-wrap{position:relative;width:100%;aspect-ratio:16/9;background:var(--surface-3);border-radius:8px;overflow:hidden}
-.video-wrap iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.video-wrap iframe,.video-wrap video{position:absolute;inset:0;width:100%;height:100%;border:0;object-fit:cover;background:#000}
 .thumb{position:relative}
 .th-first{position:absolute;top:4px;left:4px;z-index:2;background:var(--accent);color:var(--accent-ink);font-size:9px;font-weight:700;padding:2px 6px;border-radius:999px;letter-spacing:.06em}
 .th-nav{position:absolute;bottom:4px;left:0;right:0;display:flex;justify-content:center;gap:6px;z-index:2}
@@ -833,6 +838,14 @@ async function uploadImg(file,maxEdge){const c=await compressImage(file,maxEdge|
   if(error){console.error(error);throw error;}
   return sb.storage.from('photos').getPublicUrl(path).data.publicUrl;}
 async function uploadMaybe(item){return (item&&typeof item!=='string')?await uploadImg(item):item;}
+const VIDEO_MAX=52428800; // 50 MB
+async function uploadVideo(file){
+  if(file.size>VIDEO_MAX)throw new Error('O vídeo passa de 50 MB. Comprima ou escolha um menor.');
+  const ext=(file.name.split('.').pop()||'mp4').toLowerCase().replace(/[^a-z0-9]/g,'')||'mp4';
+  const path=`${state.user.id}/${uid()}-${Date.now()}.${ext}`;
+  const {error}=await sb.storage.from('videos').upload(path,file,{contentType:file.type||'video/mp4',upsert:false});
+  if(error){console.error(error);throw error;}
+  return sb.storage.from('videos').getPublicUrl(path).data.publicUrl;}
 function loadingHTML(){return '<div style="padding:90px 20px;text-align:center" class="mono">Carregando…</div>';}
 
 /* ===================== PLANS ===================== */
@@ -1385,7 +1398,9 @@ function detailBody(p,u,isPublic){
   return `
     <div class="detail-grid">
       <div class="reveal">${p.display==='carousel'?carouselHTML(photos):gridHTML(photos)}
-        ${p.video&&ytId(p.video)?`<div class="video-wrap reveal" style="margin-top:18px"><iframe loading="lazy" src="https://www.youtube-nocookie.com/embed/${ytId(p.video)}" title="Vídeo do imóvel" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>`:''}
+        ${p.video?(ytId(p.video)
+          ?`<div class="video-wrap reveal" style="margin-top:18px"><iframe loading="lazy" src="https://www.youtube-nocookie.com/embed/${ytId(p.video)}" title="Vídeo do imóvel" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>`
+          :`<div class="video-wrap reveal" style="margin-top:18px"><video controls preload="metadata" playsinline src="${esc(p.video)}"></video></div>`):''}
       </div>
       <aside class="fiche reveal" style="transition-delay:90ms">
         <div class="fiche-kicker mono">${p.status&&p.status!=='disponivel'?`<span class="status-pill status-${p.status}">${statusName(p.status)}</span> · `:''}${p.trade?'Aceita permuta':'À venda'}</div>
@@ -1547,6 +1562,7 @@ let formBuf={cover:null,gallery:[],avatar:null};
 function openPropertyModal(editId){
   const p=editId?state.properties.find(x=>x.id===editId):null;
   formBuf={cover:p?p.cover:null,gallery:p?[...(p.gallery||[])]:[],avatar:null};
+  initVideoBuf(p);
   openModal(`
     <div class="modal-head"><h3>${p?'Editar imóvel':'Adicionar imóvel'}</h3><button class="icon-btn" data-act="close-modal" style="width:34px;height:34px" aria-label="Fechar">✕</button></div>
     <div class="modal-body">
@@ -1573,8 +1589,23 @@ function openPropertyModal(editId){
       <div class="field"><label>Descrição <span class="hint">(opcional)</span></label><textarea class="inp" id="pDesc" placeholder="Conte o que torna esse imóvel especial...">${p?esc(p.desc):''}</textarea></div>
       <div class="field"><label class="check ${p&&p.trade?'on':''}" id="tradeCheck" data-act="toggle-trade" style="text-transform:none;letter-spacing:0;font-family:var(--font);font-size:inherit"><span class="box">${I.check}</span><span class="txt"><strong>Aceita permuta</strong><small>Exibe um selo no imóvel</small></span></label></div>
       <div class="field"><label>Foto principal (capa)</label><div class="drop" data-act="pick-cover">${I.img}<div>Toque para escolher · <b>uma foto</b></div></div><div id="coverPrev">${formBuf.cover?`<img class="cover-prev" src="${formBuf.cover}">`:''}</div><input type="file" id="coverInput" accept="image/*" class="hidden"></div>
-      <div class="field"><label>Vídeo do imóvel <span class="hint">${planOf(state.user).id==='free'?'(disponível nos planos pagos)':'(cole um link do YouTube)'}</span></label>
-        <input class="inp" id="pVideo" placeholder="https://youtube.com/watch?v=..." value="${p?esc(p.video||''):''}" ${planOf(state.user).id==='free'?'disabled style="opacity:.5"':''}></div>
+      <div class="field"><label>Vídeo do imóvel <span class="hint">${planOf(state.user).id==='free'?'(disponível nos planos pagos)':'(link do YouTube ou envie um arquivo, até 50 MB)'}</span></label>
+        ${planOf(state.user).id==='free'
+          ?`<input class="inp" placeholder="Disponível nos planos pagos" disabled style="opacity:.5">`
+          :`<div class="vid-tabs mono">
+              <button type="button" class="vtab ${(p&&p.video&&!ytId(p.video))?'':'on'}" data-act="vtab" data-m="link">Link do YouTube</button>
+              <button type="button" class="vtab ${(p&&p.video&&!ytId(p.video))?'on':''}" data-act="vtab" data-m="file">Enviar arquivo</button>
+            </div>
+            <div id="vidLink" style="${(p&&p.video&&!ytId(p.video))?'display:none':''}">
+              <input class="inp" id="pVideo" placeholder="https://youtube.com/watch?v=..." value="${(p&&p.video&&ytId(p.video))?esc(p.video):''}">
+            </div>
+            <div id="vidFile" style="${(p&&p.video&&!ytId(p.video))?'':'display:none'}">
+              ${(p&&p.video&&!ytId(p.video))?`<div class="vid-current mono">Vídeo enviado ✓ <button type="button" class="lnk" data-act="vid-remove">remover</button></div>`:''}
+              <input type="file" id="vidInput" accept="video/mp4,video/webm,video/quicktime" style="display:none">
+              <button type="button" class="btn btn-line" data-act="vid-pick" id="vidPickBtn" style="${(p&&p.video&&!ytId(p.video))?'display:none':''}">Escolher vídeo do dispositivo</button>
+              <div id="vidStatus" class="mono" style="margin-top:8px;font-size:12px;color:var(--ink-soft)"></div>
+            </div>`}
+      </div>
       <div class="field"><label>Outras fotos <span class="hint">(pode escolher várias · a 1ª aparece primeiro no anúncio)</span></label><div class="drop" data-act="pick-gallery">${I.img}<div>Toque para adicionar <b>várias fotos</b></div></div><div class="thumbs" id="galThumbs">${galThumbsHTML()}</div><input type="file" id="galInput" accept="image/*" multiple class="hidden"></div>
       <div class="field"><label>Exibição das fotos no anúncio <span class="hint">(você escolhe aqui; o cliente vê do jeito que definir)</span></label>
         <div class="seg">
@@ -1591,6 +1622,7 @@ function openPropertyModal(editId){
     $('#galThumbs').innerHTML=galThumbsHTML();});
   mapPreview();
 }
+function initVideoBuf(p){formBuf.videoMode=(p&&p.video&&!ytId(p.video))?'file':'link';formBuf.videoFile=null;formBuf.videoExisting=(p&&p.video&&!ytId(p.video))?p.video:'';}
 function galThumbsHTML(){const n=formBuf.gallery.length;
   return formBuf.gallery.map((s,i)=>{const src=(typeof s==='string')?s:URL.createObjectURL(s);
     return `<div class="thumb">${i===0?'<span class="th-first mono">1ª</span>':''}<img src="${src}">
@@ -1607,8 +1639,17 @@ async function saveProperty(editId){
   const btn=document.querySelector('[data-act="save-property"]');if(btn){btn.disabled=true;btn.textContent='Salvando…';}
   try{
     let video='';
-    if(planOf(state.user).id!=='free'){video=($('#pVideo')?$('#pVideo').value.trim():'');
-      if(video&&!ytId(video)){toast('Cole um link válido do YouTube (ou deixe em branco).',false);if(btn){btn.disabled=false;btn.textContent='Salvar';}return;}}
+    if(planOf(state.user).id!=='free'){
+      if(formBuf.videoMode==='file'){
+        if(formBuf.videoFile){
+          try{if(btn)btn.textContent='Enviando vídeo…';video=await uploadVideo(formBuf.videoFile);}
+          catch(err){toast(err.message||'Não foi possível enviar o vídeo.',false);if(btn){btn.disabled=false;btn.textContent='Salvar';}return;}
+        }else{video=formBuf.videoExisting||'';}
+      }else{
+        video=($('#pVideo')?$('#pVideo').value.trim():'');
+        if(video&&!ytId(video)){toast('Cole um link válido do YouTube (ou deixe em branco).',false);if(btn){btn.disabled=false;btn.textContent='Salvar';}return;}
+      }
+    }
     const cover=await uploadMaybe(formBuf.cover);
     const gallery=[];for(const g of formBuf.gallery){gallery.push(await uploadMaybe(g));}
     const obj={name,street:v('#pStreet'),neighborhood:v('#pNeigh'),city:v('#pCity'),ufp:v('#pUf').toUpperCase(),
@@ -1729,6 +1770,14 @@ document.addEventListener('click',e=>{
     case 'pick-gallery':$('#galInput').click();break;
     case 'rm-gal':formBuf.gallery.splice(Number(t.dataset.i),1);$('#galThumbs').innerHTML=galThumbsHTML();break;
     case 'mv-gal':moveGal(Number(t.dataset.i),Number(t.dataset.d));break;
+    case 'vtab':{formBuf.videoMode=t.dataset.m;
+      document.querySelectorAll('.vtab').forEach(x=>x.classList.toggle('on',x.dataset.m===t.dataset.m));
+      $('#vidLink').style.display=t.dataset.m==='link'?'':'none';
+      $('#vidFile').style.display=t.dataset.m==='file'?'':'none';break;}
+    case 'vid-pick':$('#vidInput').click();break;
+    case 'vid-remove':{formBuf.videoFile=null;formBuf.videoExisting='';
+      const c=document.querySelector('.vid-current');if(c)c.remove();
+      const pb=$('#vidPickBtn');if(pb)pb.style.display='';$('#vidStatus').textContent='';break;}
     case 'pick-avatar':$('#avInput').click();break;
     case 'rm-avatar':formBuf.avatar=null;$('#avPrev').innerHTML=avatarHTML({...state.user,avatar:null},78,8);t.remove();break;
     case 'save-property':saveProperty(t.dataset.edit||null);break;
@@ -1743,6 +1792,11 @@ document.addEventListener('keydown',e=>{
 $('#loginPass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
 document.addEventListener('input',e=>{if(e.target&&e.target.id==='ownSearch'){state.ownQ=e.target.value;applyOwnerFilters();}});
 document.addEventListener('change',e=>{if(e.target&&e.target.id==='ownStatus'){state.ownSt=e.target.value;applyOwnerFilters();}});
+document.addEventListener('change',e=>{if(e.target&&e.target.id==='vidInput'){const f=e.target.files[0];if(!f)return;
+  if(f.size>52428800){toast('O vídeo passa de 50 MB. Escolha um menor.',false);e.target.value='';return;}
+  formBuf.videoFile=f;formBuf.videoExisting='';
+  const mb=(f.size/1048576).toFixed(1);$('#vidStatus').innerHTML=`Selecionado: <strong>${esc(f.name)}</strong> (${mb} MB). Será enviado ao salvar.`;
+  const pb=$('#vidPickBtn');if(pb)pb.textContent='Trocar vídeo';}});
 document.addEventListener('change',e=>{if(e.target.classList&&e.target.classList.contains('filter-sel'))applyPublicFilters();});
 
 /* ===== motion: deriva horizontal no scroll ===== */
