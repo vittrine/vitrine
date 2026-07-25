@@ -232,7 +232,8 @@ img{display:block}
 .car-nav.prev{left:16px}.car-nav.next{right:16px}
 .car-nav svg{width:20px;height:20px}
 .car-count{position:absolute;top:16px;right:16px;z-index:3;font-family:var(--mono);font-size:12px;font-weight:700;color:#fff;background:rgba(14,13,9,.6);padding:5px 11px;border-radius:2px;backdrop-filter:blur(4px)}
-.zoom-hint{position:absolute;top:16px;left:16px;z-index:3;font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.08em;color:#fff;background:rgba(14,13,9,.5);padding:5px 10px;border-radius:2px;backdrop-filter:blur(4px);pointer-events:none}
+.zoom-hint{position:absolute;top:16px;left:16px;z-index:3;display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.08em;color:#fff;background:rgba(14,13,9,.5);padding:5px 10px;border-radius:2px;backdrop-filter:blur(4px);pointer-events:none}
+.zoom-hint svg{width:13px;height:13px;flex:none}
 .car-dots{position:absolute;bottom:16px;left:0;right:0;display:flex;justify-content:center;gap:8px;z-index:3}
 .car-dot{width:8px;height:8px;border-radius:999px;background:rgba(255,255,255,.45);transition:width .3s var(--spring),background .3s}
 .car-dot.on{width:26px;background:#fff}
@@ -300,7 +301,11 @@ img{display:block}
 .limit-note{display:flex;align-items:center;gap:16px;flex-wrap:wrap;justify-content:space-between;background:var(--accent-soft);border:1px solid color-mix(in srgb,var(--accent) 32%,transparent);border-radius:10px;padding:14px 18px;margin-bottom:24px}
 .limit-note span{font-size:14px;font-weight:500}
 
-.filter-bar{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 26px}
+.filter-bar{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:0 0 26px}
+@media(min-width:820px){.filter-bar{display:flex;flex-wrap:wrap}}
+.filter-bar .filter-sel{width:100%}
+.filter-bar .own-search{grid-column:1/-1}
+@media(min-width:820px){.filter-bar .own-search{grid-column:auto}}
 .filter-sel{appearance:none;-webkit-appearance:none;background:var(--surface);border:1.5px solid var(--line-strong);color:var(--ink);
   padding:11px 38px 11px 15px;border-radius:var(--r);font-size:13.5px;font-weight:500;cursor:pointer;transition:border-color .2s;
   background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='none' stroke='%23A6A299' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M3 5l4 4 4-4'/></svg>");
@@ -328,8 +333,11 @@ img{display:block}
 /* ============================ LIGHTBOX ============================ */
 .lb{position:fixed;inset:0;z-index:80;background:rgba(8,8,6,.95);display:grid;place-items:center;opacity:0;pointer-events:none;transition:opacity .3s}
 .lb.open{opacity:1;pointer-events:auto}
-.lb-img{max-width:90vw;max-height:84vh;object-fit:contain;border-radius:2px;box-shadow:0 30px 80px rgba(0,0,0,.6);animation:lbIn .42s var(--spring)}
-@keyframes lbIn{from{opacity:0;transform:scale(.965)}to{opacity:1;transform:none}}
+.lb-viewport{width:100vw;height:84vh;overflow:hidden}
+.lb-track{display:flex;height:100%;transition:transform .45s var(--spring);will-change:transform}
+.lb-slide{min-width:100vw;height:100%;display:grid;place-items:center;padding:0 4vw}
+.lb-slide img{max-width:92vw;max-height:84vh;object-fit:contain;border-radius:2px;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+@media(min-width:900px){.lb-slide{padding:0 90px}.lb-slide img{max-width:calc(100vw - 200px)}}
 .lb-close{position:fixed;top:20px;right:22px;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.12);color:#fff;font-size:17px;transition:background .2s,transform .25s var(--spring);z-index:3}
 .lb-close:hover{background:rgba(255,255,255,.22);transform:scale(1.06)}
 .lb-nav{position:fixed;top:50%;transform:translateY(-50%);width:52px;height:52px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.12);color:#fff;transition:background .2s,transform .25s var(--spring);z-index:3}
@@ -532,7 +540,15 @@ textarea.inp{resize:vertical;min-height:80px;line-height:1.5}
 .wa-float{position:fixed;right:18px;bottom:18px;z-index:50;display:flex;align-items:center;gap:9px;background:#25D366;color:#fff;padding:13px 18px;border-radius:999px;box-shadow:0 8px 26px rgba(0,0,0,.28);text-decoration:none;font-weight:700;font-size:14px;transition:transform .2s,box-shadow .2s}
 .wa-float:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(0,0,0,.35)}
 .wa-float span{white-space:nowrap}
-@media(max-width:520px){.wa-float span{display:none}.wa-float{padding:15px;border-radius:50%}}
+@media(max-width:520px){.wa-float span{display:none}.wa-float{padding:15px;border-radius:50%}
+  .car-nav{width:34px;height:34px}
+  .car-nav svg{width:15px;height:15px}
+  .car-nav.prev{left:9px}.car-nav.next{right:9px}
+  .car-count{top:10px;right:10px;font-size:10.5px;padding:4px 8px}
+  .zoom-hint{top:10px;left:10px;font-size:9px;padding:4px 8px}
+  .zoom-hint svg{width:11px;height:11px}
+  .car-dots{bottom:10px}
+  .car-dot{width:6px;height:6px}.car-dot.on{width:20px}}
 .viewbadge{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--ink-faint);text-transform:none;letter-spacing:.02em;margin-left:auto}
 .video-wrap{position:relative;width:100%;aspect-ratio:16/9;background:var(--surface-3);border-radius:8px;overflow:hidden}
 .video-wrap iframe,.video-wrap video{position:absolute;inset:0;width:100%;height:100%;border:0;object-fit:cover;background:#000}
@@ -770,7 +786,7 @@ textarea.inp{resize:vertical;min-height:80px;line-height:1.5}
 <div id="appView" class="hidden">
   <header class="mast">
     <div class="mast-in">
-      <div class="wordmark" data-act="go-catalog"><span class="dot"></span><span>VI<span class="tt">TT</span>RINE</span></div>
+      <div class="wordmark" data-act="go-landing"><span class="dot"></span><span>VI<span class="tt">TT</span>RINE</span></div>
       <div class="spacer"></div>
       <div class="menu-wrap">
         <button class="av-btn" data-act="toggle-menu" aria-haspopup="true">
@@ -796,7 +812,7 @@ textarea.inp{resize:vertical;min-height:80px;line-height:1.5}
   <div id="pubBanner"></div>
   <header class="pubmast">
     <div class="pubmast-in">
-      <div class="wordmark" data-act="pub-home"><span class="dot"></span><span>VI<span class="tt">TT</span>RINE</span></div>
+      <div class="wordmark" data-act="go-landing"><span class="dot"></span><span>VI<span class="tt">TT</span>RINE</span></div>
       <div class="spacer"></div>
       <a class="pub-login" data-act="go-auth" href="#">É corretor? Entrar</a>
     </div>
@@ -835,7 +851,6 @@ const pad=n=>String(n).padStart(2,'0');
 /* ---- maps (key-free Google embed) ---- */
 const embedSrc=q=>`https://www.google.com/maps?q=${encodeURIComponent(q)}&z=15&hl=pt-BR&output=embed`;
 const linkSrc=q=>`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`;
-const dirSrc=q=>`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(q)}`;
 function parseCoords(s){if(!s)return null;const m=s.match(/@(-?\d{1,3}\.\d+),(-?\d{1,3}\.\d+)/)||s.match(/[?&](?:q|query|destination)=(-?\d{1,3}\.\d+),(-?\d{1,3}\.\d+)/)||s.match(/!3d(-?\d{1,3}\.\d+)!4d(-?\d{1,3}\.\d+)/)||s.match(/^\s*(-?\d{1,3}\.\d+)\s*,\s*(-?\d{1,3}\.\d+)\s*$/);return m?`${m[1]},${m[2]}`:null;}
 function mapQueryFor(p){if(p.coords)return p.coords;const parts=[p.street,p.neighborhood,p.city,p.ufp].filter(Boolean);return parts.length?parts.join(', ')+', Brasil':'';}
 function modalMapQuery(){const v=id=>(($(id)&&$(id).value)||'').trim();const c=parseCoords(v('#pMapLink'));if(c)return c;const parts=[v('#pStreet'),v('#pNeigh'),v('#pCity'),v('#pUf')].filter(Boolean);return parts.length?parts.join(', ')+', Brasil':'';}
@@ -843,7 +858,7 @@ function mapPreview(){const box=$('#mapPrev');if(!box)return;const q=modalMapQue
 function mapBlock(p){const q=mapQueryFor(p);if(!q)return '';const addr=[p.street,p.neighborhood,(p.city||'')+(p.ufp?'/'+p.ufp:'')].filter(Boolean).join(' · ');
   return `<section class="reveal"><div class="index-eyebrow" style="margin-top:54px"><span class="sq"></span>Localização</div>
     <div class="map-frame"><iframe class="map-embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen src="${embedSrc(q)}"></iframe></div>
-    <div class="map-actions"><a class="btn btn-line" href="${dirSrc(q)}" target="_blank" rel="noopener">Ver no Google Maps e traçar rota</a></div>
+    <div class="map-actions"><a class="btn btn-line" href="${linkSrc(q)}" target="_blank" rel="noopener">Ver no Google Maps</a></div>
     ${addr?`<p class="map-note mono">${esc(addr)}</p>`:''}</section>`;}
 
 const THEMES=[
@@ -871,15 +886,18 @@ function propToRow(p){return {ref:p.ref,name:p.name,street:p.street,neighborhood
   description:p.desc,display:p.display,cover:p.cover,gallery:p.gallery,coords:p.coords,map_link:p.mapLink,video:p.video||'',pos:p.pos};}
 function cacheBroker(b){if(!b)return;const i=state.brokers.findIndex(x=>x.id===b.id);if(i>=0)state.brokers[i]=b;else state.brokers.push(b);}
 function putProp(p){const i=state.properties.findIndex(x=>x.id===p.id);if(i>=0)state.properties[i]=p;else state.properties.push(p);}
-async function fetchBroker(id){const {data,error}=await sb.from('brokers').select('*').eq('id',id).maybeSingle();
+async function fetchBroker(id){
+  // dados completos só do próprio corretor logado; de terceiros, só o que é público
+  const own=state.user&&state.user.id===id;
+  const {data,error}=await sb.from(own?'brokers':'brokers_public').select('*').eq('id',id).maybeSingle();
   if(error)console.error(error);if(data)cacheBroker(data);return data;}
 async function fetchProps(brokerId){const {data,error}=await sb.from('properties').select('*').eq('broker',brokerId).order('pos',{ascending:true,nullsFirst:false}).order('created_at',{ascending:false});
   if(error)console.error(error);return (data||[]).map(rowToProp);}
 async function fetchProp(id){const {data,error}=await sb.from('properties').select('*').eq('id',id).maybeSingle();
   if(error)console.error(error);return data?rowToProp(data):null;}
 function slugify(s){return (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,30)||'corretor';}
-async function handleTaken(h,exceptId){const {data}=await sb.from('brokers').select('id').eq('handle',h).maybeSingle();return !!(data&&data.id!==exceptId);}
-async function fetchBrokerByHandle(h){const {data}=await sb.from('brokers').select('*').eq('handle',h).maybeSingle();if(data)cacheBroker(data);return data;}
+async function handleTaken(h,exceptId){const {data}=await sb.from('brokers_public').select('id').eq('handle',h).maybeSingle();return !!(data&&data.id!==exceptId);}
+async function fetchBrokerByHandle(h){const {data}=await sb.from('brokers_public').select('*').eq('handle',h).maybeSingle();if(data)cacheBroker(data);return data;}
 async function ensureHandle(){const u=state.user;if(!u||u.handle)return;
   let base=slugify(u.name),h=base,n=1;
   while(await handleTaken(h,u.id)){n++;h=base+'-'+n;if(n>40){h=base+'-'+uid().slice(0,4);break;}}
@@ -955,16 +973,6 @@ async function quickStatus(id,st){
   const p=state.properties.find(x=>x.id===id);if(p)p.status=st;
   toast(`Situação atualizada: ${statusName(st)}.`);
   applyOwnerFilters();
-}
-async function dupProp(id){
-  const p=state.properties.find(x=>x.id===id);if(!p)return;
-  if(!canAdd()){upgradeModal();return;}
-  const row=propToRow(p);row.broker=state.user.id;row.name=p.name+' (cópia)';row.pos=Math.min(0,...(state.properties.map(x=>x.pos??1)))-1;
-  row.ref='VT-'+Math.random().toString(36).slice(2,6).toUpperCase();row.status='disponivel';
-  const {data,error}=await sb.from('properties').insert(row).select().single();
-  if(error||!data){console.error(error);toast('Não foi possível duplicar.',false);return;}
-  state.properties.unshift(rowToProp(data));
-  toast('Imóvel duplicado. Ajuste os detalhes e as fotos.');renderCatalog();observeReveals();
 }
 function statusBadge(p){return (p.status&&p.status!=='disponivel')?`<span class="badge status-${p.status}">${statusName(p.status)}</span>`:'';}
 const PRICE_RANGES=[
@@ -1055,6 +1063,7 @@ async function route(){
   if(t==='u'&&id){showSection('public');return loadPublicProfile(id);}
   if(t==='i'&&id){showSection('public');return loadPublicProperty(id);}
   if(t==='entrar'){if(state.user){location.hash='';return;}applyTheme();showSection('auth');switchAuthTab(state.authTab||'login');return;}
+  if(t==='inicio'){applyTheme();showSection('landing');observeReveals();window.scrollTo(0,0);return;}
   if(t&&t!=='u'&&t!=='i'&&!id){showSection('public');return loadPublicByHandle(t);}
   if(state.user){showSection('app');applyTheme();await loadOwner();return;}
   applyTheme();showSection('landing');observeReveals();
@@ -1359,7 +1368,7 @@ document.addEventListener('click',e=>{if(!e.target.closest('.menu-wrap'))closeMe
 function shareLink(hash,title,msg,og){
   // copia direto o link limpo do site (é o que o corretor manda pro cliente)
   const url=location.origin+location.pathname+hash;
-  copyText(url,'Link copiado! É só colar no WhatsApp.');}
+  copyText(url,'Link copiado!');}
 async function copyText(text,okMsg){
   try{await navigator.clipboard.writeText(text);toast(okMsg||'Copiado!');return;}catch(e){}
   // fallback universal: textarea temporário + execCommand
@@ -1508,7 +1517,6 @@ function entryHTML(p,i){
       <button data-act="move-prop" data-id="${p.id}" data-d="-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m18 15-6-6-6 6"/></svg> Mover para cima</button>
       <button data-act="move-prop" data-id="${p.id}" data-d="1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg> Mover para baixo</button>
       <div class="sep"></div>
-      <button data-act="dup-prop" data-id="${p.id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Duplicar</button>
       <div class="sep"></div>
       <div class="cm-status mono">Situação</div>
       ${STATUSES.map(x=>`<button data-act="set-status" data-id="${p.id}" data-st="${x.id}" class="${(p.status||'disponivel')===x.id?'st-on':''}"><span class="st-dot st-${x.id}"></span> ${x.name}</button>`).join('')}
@@ -1722,18 +1730,30 @@ let lbPhotos=[],lbIndex=0,lbOpen=false;
 function openLightbox(i){lbPhotos=curPhotos();lbIndex=i||0;lbOpen=true;renderLightbox();$('#lightbox').classList.add('open');document.body.style.overflow='hidden';}
 function renderLightbox(){const n=lbPhotos.length;
   $('#lightbox').innerHTML=`
-    <div class="lb-count">${pad(lbIndex+1)} / ${pad(n)}</div>
+    <div class="lb-count"><span id="lbCount">${pad(lbIndex+1)} / ${pad(n)}</span></div>
     <button class="lb-close" data-act="lb-close" aria-label="Fechar">✕</button>
-    <img class="lb-img" src="${lbPhotos[lbIndex]}" alt="" onerror="this.src='${fallbackImg('Foto')}'">
+    <div class="lb-viewport"><div class="lb-track" id="lbTrack" style="transform:translateX(-${lbIndex*100}%)">
+      ${lbPhotos.map(src=>`<div class="lb-slide"><img src="${src}" alt="" onerror="this.src='${fallbackImg('Foto')}'"></div>`).join('')}
+    </div></div>
     ${n>1?`<button class="lb-nav prev" data-act="lb-prev" aria-label="Anterior">${I.left}</button>
       <button class="lb-nav next" data-act="lb-next" aria-label="Próxima">${I.right}</button>
-      <div class="lb-dots">${lbPhotos.map((_,k)=>`<button class="car-dot ${k===lbIndex?'on':''}" data-act="lb-dot" data-i="${k}"></button>`).join('')}</div>`:''}`;}
-function lbGo(i){lbIndex=(i+lbPhotos.length)%lbPhotos.length;renderLightbox();}
+      <div class="lb-dots" id="lbDots">${lbPhotos.map((_,k)=>`<button class="car-dot ${k===lbIndex?'on':''}" data-act="lb-dot" data-i="${k}"></button>`).join('')}</div>`:''}`;}
+function lbGo(i){lbIndex=(i+lbPhotos.length)%lbPhotos.length;
+  const t=$('#lbTrack');if(t)t.style.transform=`translateX(-${lbIndex*100}%)`;
+  const c=$('#lbCount');if(c)c.textContent=pad(lbIndex+1)+' / '+pad(lbPhotos.length);
+  const d=$('#lbDots');if(d)d.querySelectorAll('.car-dot').forEach((x,k)=>x.classList.toggle('on',k===lbIndex));}
 function closeLightbox(){lbOpen=false;$('#lightbox').classList.remove('open');document.body.style.overflow='';}
-$('#lightbox').addEventListener('click',e=>{if(e.target.id==='lightbox')closeLightbox();});
+$('#lightbox').addEventListener('click',e=>{const t=e.target;
+  if(t.id==='lightbox'||t.classList.contains('lb-slide')||t.classList.contains('lb-viewport'))closeLightbox();});
 (function(){let x0=null;const lb=$('#lightbox');
-  lb.addEventListener('touchstart',e=>x0=e.touches[0].clientX,{passive:true});
-  lb.addEventListener('touchend',e=>{if(x0==null||!lbOpen)return;const dx=e.changedTouches[0].clientX-x0;if(Math.abs(dx)>40)lbGo(lbIndex+(dx<0?1:-1));x0=null;});})();
+  lb.addEventListener('touchstart',e=>{x0=e.touches[0].clientX;const t=$('#lbTrack');if(t)t.style.transition='none';},{passive:true});
+  lb.addEventListener('touchmove',e=>{if(x0==null||!lbOpen)return;const dx=e.touches[0].clientX-x0;
+    const t=$('#lbTrack');if(t)t.style.transform=`translateX(calc(-${lbIndex*100}% + ${dx}px))`;},{passive:true});
+  lb.addEventListener('touchend',e=>{if(x0==null||!lbOpen)return;
+    const t=$('#lbTrack');if(t)t.style.transition='';
+    const dx=e.changedTouches[0].clientX-x0;
+    if(Math.abs(dx)>50)lbGo(lbIndex+(dx<0?1:-1));else lbGo(lbIndex);
+    x0=null;});})();
 
 /* ===================== MODALS ===================== */
 function openModal(h){$('#modal').innerHTML=h;$('#overlay').classList.add('open');document.body.style.overflow='hidden';}
@@ -1878,7 +1898,7 @@ async function saveProfile(){const u=state.user;
   const btn=document.querySelector('[data-act="save-profile"]');if(btn){btn.disabled=true;btn.textContent='Salvando…';}
   try{
     let handle=slugify($('#prHandle').value)||u.handle;
-    const RESERVED=['entrar','criar','u','i','login','admin','app','vitrine'];
+    const RESERVED=['entrar','criar','u','i','login','admin','app','vitrine','vittrine','inicio','api','www','suporte','ajuda','conta','sobre','planos','contato'];
     if(handle!==u.handle&&(RESERVED.includes(handle)||await handleTaken(handle,u.id))){toast('Esse link não está disponível. Tente outro.',false);if(btn){btn.disabled=false;btn.textContent='Salvar';}return;}
     let avatar=u.avatar;
     if(formBuf.avatar&&typeof formBuf.avatar!=='string')avatar=await uploadImg(formBuf.avatar,512);
@@ -1900,7 +1920,7 @@ document.addEventListener('click',e=>{
     case 'forgot-pass':forgotPassModal();break;
     case 'send-reset':sendReset();break;
     case 'save-newpass':saveNewPass();break;
-    case 'go-landing':e.preventDefault();location.hash='';break;
+    case 'go-landing':e.preventDefault();if(location.hash==='#/inicio')route();else location.hash='#/inicio';break;
     case 'go-login':e.preventDefault();state.authTab='login';if(location.hash==='#/entrar'){route();}else{location.hash='#/entrar';}break;
     case 'go-signup':e.preventDefault();state.authTab='signup';if(location.hash==='#/entrar'){route();}else{location.hash='#/entrar';}break;
     case 'lp-scroll':{const el=document.getElementById(t.dataset.to);if(el)el.scrollIntoView({behavior:'smooth',block:'start'});break;}
@@ -1940,7 +1960,6 @@ document.addEventListener('click',e=>{
     case 'map-preview':mapPreview();break;
     case 'card-menu':toggleCardMenu(t.dataset.id);break;
     case 'set-status':closeCardMenus&&closeCardMenus();quickStatus(t.dataset.id,t.dataset.st);break;
-    case 'dup-prop':closeCardMenus&&closeCardMenus();dupProp(t.dataset.id);break;
     case 'move-prop':moveProp(t.dataset.id,Number(t.dataset.d));break;
     case 'confirm-goto-login':switchAuthTab('login');break;
     case 'confirm-resend':resendConfirm();break;
@@ -1953,7 +1972,6 @@ document.addEventListener('click',e=>{
     case 'preview-profile':{const bb=state.brokers.find(x=>x.id===t.dataset.id)||state.user;location.hash=bb&&bb.handle?('#/'+bb.handle):('#/u/'+t.dataset.id);break;}
     case 'pub-open':location.hash='#/i/'+t.dataset.id;window.scrollTo(0,0);break;
     case 'pub-back':{const bb=state.brokers.find(x=>x.id===t.dataset.id);location.hash=bb&&bb.handle?('#/'+bb.handle):('#/u/'+t.dataset.id);break;}
-    case 'pub-home':{const bb=state.brokers.find(x=>x.id===state.pubBrokerId);if(bb)location.hash=bb.handle?('#/'+bb.handle):('#/u/'+bb.id);break;}
     case 'exit-preview':location.hash='';break;
     case 'clear-filters':clearFilters();break;
     case 'go-auth':e.preventDefault();state.authTab='login';location.hash='#/entrar';break;
