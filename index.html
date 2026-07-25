@@ -702,7 +702,7 @@ textarea.inp{resize:vertical;min-height:80px;line-height:1.5}
   <div class="auth-wm">VI<span class="tt">TT</span>RINE</div>
 
   <div class="auth-card">
-    <div class="top"><span class="mono">Plataforma p/ corretores</span></div>
+    <div class="top"><span class="mono">Plataforma para corretores</span></div>
 
     <div class="tabs" id="authTabs" data-on="login">
       <span class="tab-ind"></span>
@@ -713,8 +713,8 @@ textarea.inp{resize:vertical;min-height:80px;line-height:1.5}
     <div id="paneLogin">
       <h2 class="auth-title">Acesse sua vitrine</h2>
       <p class="auth-desc">Entre para gerenciar seus imóveis.</p>
-      <div class="field"><label>E-mail</label><input class="inp" id="loginEmail" type="email" placeholder="voce@email.com" autocomplete="username"></div>
-      <div class="field"><label>Senha</label><input class="inp" id="loginPass" type="password" placeholder="••••••••" autocomplete="current-password"></div>
+      <div class="field"><label>E-mail</label><input class="inp" id="loginEmail" type="email" autocomplete="username"></div>
+      <div class="field"><label>Senha</label><input class="inp" id="loginPass" type="password" autocomplete="current-password"></div>
       <button class="btn btn-primary btn-block" data-act="do-login">Entrar →</button>
       <div class="auth-alt"><span data-act="forgot-pass" style="cursor:pointer;text-decoration:underline;text-underline-offset:3px">Esqueci minha senha</span></div>
       <div class="demo-note">Primeira vez? Crie sua conta na aba <b>Criar conta</b>.</div>
@@ -723,19 +723,19 @@ textarea.inp{resize:vertical;min-height:80px;line-height:1.5}
     <div id="paneSignup" class="hidden">
       <h2 class="auth-title">Crie sua conta</h2>
       <p class="auth-desc">Leva menos de um minuto.</p>
-      <div class="field" data-f="name"><label>Nome completo</label><input class="inp" id="suName" placeholder="Ex.: Marina Costa"><div class="errline">Informe seu nome.</div></div>
+      <div class="field" data-f="name"><label>Nome completo</label><input class="inp" id="suName"><div class="errline">Informe seu nome.</div></div>
       <div class="row2">
-        <div class="field" data-f="phone"><label>Telefone / WhatsApp</label><input class="inp" id="suPhone" placeholder="(64) 99999-0000" inputmode="tel"><div class="errline">Informe um telefone.</div></div>
+        <div class="field" data-f="phone"><label>Telefone / WhatsApp</label><input class="inp" id="suPhone" inputmode="tel"><div class="errline">Informe um telefone.</div></div>
         <div class="rowCreci">
-          <div class="field" data-f="creci"><label>CRECI</label><input class="inp" id="suCreci" placeholder="12345"><div class="errline">Obrigatório.</div></div>
-          <div class="field" data-f="uf"><label>UF</label><input class="inp" id="suUf" placeholder="GO" maxlength="2"><div class="errline">UF.</div></div>
+          <div class="field" data-f="creci"><label>CRECI</label><input class="inp" id="suCreci"><div class="errline">Obrigatório.</div></div>
+          <div class="field" data-f="uf"><label>UF</label><input class="inp" id="suUf" maxlength="2"><div class="errline">UF.</div></div>
         </div>
       </div>
       <div class="row2">
-        <div class="field" data-f="region"><label>Região de atuação</label><input class="inp" id="suRegion" placeholder="Goiânia, GO"><div class="errline">Informe a região.</div></div>
-        <div class="field"><label>Imobiliária <span class="hint">(opcional)</span></label><input class="inp" id="suAgency" placeholder="Costa Imóveis"></div>
+        <div class="field" data-f="region"><label>Região de atuação</label><input class="inp" id="suRegion"><div class="errline">Informe a região.</div></div>
+        <div class="field"><label>Imobiliária <span class="hint">(opcional)</span></label><input class="inp" id="suAgency"></div>
       </div>
-      <div class="field" data-f="email"><label>E-mail <span class="hint">(para confirmação)</span></label><input class="inp" id="suEmail" type="email" placeholder="voce@email.com"><div class="errline">E-mail inválido.</div></div>
+      <div class="field" data-f="email"><label>E-mail</label><input class="inp" id="suEmail" type="email"><div class="errline">E-mail inválido.</div></div>
       <div class="field" data-f="pass"><label>Senha</label><input class="inp" id="suPass" type="password" placeholder="Mínimo 6 caracteres"><div class="errline">Mínimo de 6 caracteres.</div></div>
       <button class="btn btn-primary btn-block" data-act="do-signup">Criar conta →</button>
       <div class="auth-alt">Enviaremos um e-mail de confirmação após o cadastro.</div>
