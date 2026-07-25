@@ -17,6 +17,10 @@
 <meta name="twitter:description" content="O catálogo de imóveis do corretor, em um único link.">
 <meta name="twitter:image" content="https://lbdjqtvcnychbrlhzwue.supabase.co/storage/v1/object/public/photos/brand/og.png">
 <meta name="theme-color" content="#0D0D0C">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Vittrine">
+<link rel="apple-touch-icon" href="https://lbdjqtvcnychbrlhzwue.supabase.co/storage/v1/object/public/photos/brand/icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Inter:wght@400;450;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -68,6 +72,15 @@
   --accent:#3FAEBC;--accent-strong:#5BBECB;--accent-soft:#0E3035;--accent-ink:#04161A;--spot:#DDA85A;--spot-soft:#322712; }
 
 *{box-sizing:border-box}
+/* scrollbar estilizada no tema */
+*{scrollbar-width:thin;scrollbar-color:var(--line-strong) transparent}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--line-strong);border-radius:999px;border:2px solid var(--bg);background-clip:padding-box}
+::-webkit-scrollbar-thumb:hover{background:var(--accent);background-clip:padding-box}
+.modal-body::-webkit-scrollbar{width:8px}
+.modal-body::-webkit-scrollbar-thumb{background:var(--line-strong);border:2px solid var(--surface);border-radius:999px;background-clip:padding-box}
+.modal-body::-webkit-scrollbar-thumb:hover{background:var(--accent);background-clip:padding-box}
 html,body{margin:0;padding:0}
 body{font-family:var(--font);background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.5;
   transition:background .5s var(--ease),color .5s var(--ease)}
@@ -492,6 +505,30 @@ textarea.inp{resize:vertical;min-height:80px;line-height:1.5}
 .vtab.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 .vid-current{font-size:12px;color:var(--ink-soft);margin-bottom:10px}
 .lnk{background:none;border:none;color:var(--accent-strong);cursor:pointer;text-decoration:underline;font:inherit;padding:0}
+.metric-card{background:var(--surface);border:1.5px solid var(--line-strong);border-radius:12px;padding:22px 24px;margin-top:20px}
+.mbar-wrap{display:flex;align-items:flex-end;gap:6px;height:110px}
+.mbar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;justify-content:flex-end}
+.mbar{width:100%;max-width:26px;background:var(--accent);border-radius:4px 4px 0 0;transition:height .5s ease}
+.mbar-lbl{font-size:9px;color:var(--ink-faint)}
+.toprow{display:flex;align-items:center;gap:12px;padding:11px 0;border-top:1px solid var(--line)}
+.toprow:first-of-type{border-top:0}
+.topn{width:24px;height:24px;border-radius:50%;background:var(--accent-soft);color:var(--accent-strong);display:grid;place-items:center;font-size:12px;font-weight:700;flex:none}
+.topname{flex:1;font-size:14.5px}
+.topviews{font-size:12px;color:var(--ink-soft)}
+.tour-ov{position:fixed;inset:0;z-index:80;background:rgba(10,10,8,.72);animation:fadein .3s ease}
+.tour-hole{position:absolute;border-radius:10px;box-shadow:0 0 0 9999px rgba(10,10,8,.72);border:2px solid var(--accent);transition:all .35s ease;pointer-events:none}
+.tour-card{position:absolute;width:min(288px,86vw);background:var(--surface);border:1.5px solid var(--accent);border-radius:12px;padding:16px 18px;box-shadow:0 14px 40px rgba(0,0,0,.4);transition:all .35s ease}
+.tour-card strong{font-size:15.5px;display:block;margin-bottom:5px}
+.tour-card p{margin:0;font-size:13.5px;color:var(--ink-soft);line-height:1.5}
+.tour-step{font-size:10px;color:var(--accent-strong);letter-spacing:.1em;margin-bottom:6px}
+.tour-nav{display:flex;justify-content:space-between;align-items:center;margin-top:14px}
+.tour-skip{background:none;border:none;color:var(--ink-faint);cursor:pointer;font:inherit;font-size:13px;text-decoration:underline}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+.wa-float{position:fixed;right:18px;bottom:18px;z-index:50;display:flex;align-items:center;gap:9px;background:#25D366;color:#fff;padding:13px 18px;border-radius:999px;box-shadow:0 8px 26px rgba(0,0,0,.28);text-decoration:none;font-weight:700;font-size:14px;transition:transform .2s,box-shadow .2s}
+.wa-float:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(0,0,0,.35)}
+.wa-float span{white-space:nowrap}
+@media(max-width:520px){.wa-float span{display:none}.wa-float{padding:15px;border-radius:50%}}
+.viewbadge{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--ink-faint);text-transform:none;letter-spacing:.02em;margin-left:auto}
 .video-wrap{position:relative;width:100%;aspect-ratio:16/9;background:var(--surface-3);border-radius:8px;overflow:hidden}
 .video-wrap iframe,.video-wrap video{position:absolute;inset:0;width:100%;height:100%;border:0;object-fit:cover;background:#000}
 .thumb{position:relative}
@@ -718,6 +755,7 @@ textarea.inp{resize:vertical;min-height:80px;line-height:1.5}
         <div class="menu-pop" id="menuPop">
           <button class="menu-item" data-act="nav-edit-profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg> Editar perfil</button>
           <button class="menu-item" data-act="nav-leads"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Leads <span class="menu-badge" id="leadsBadge" style="display:none"></span></button>
+          <button class="menu-item" data-act="nav-metrics"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg> Métricas</button>
           <button class="menu-item" data-act="nav-plans"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7h18M3 12h18M3 17h18"/><circle cx="7" cy="7" r="0"/></svg> Planos</button>
           <div class="menu-sep"></div>
           <button class="menu-item" data-act="nav-logout"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg> Sair</button>
@@ -780,7 +818,7 @@ function mapPreview(){const box=$('#mapPrev');if(!box)return;const q=modalMapQue
 function mapBlock(p){const q=mapQueryFor(p);if(!q)return '';const addr=[p.street,p.neighborhood,(p.city||'')+(p.ufp?'/'+p.ufp:'')].filter(Boolean).join(' · ');
   return `<section class="reveal"><div class="index-eyebrow" style="margin-top:54px"><span class="sq"></span>Localização</div>
     <div class="map-frame"><iframe class="map-embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen src="${embedSrc(q)}"></iframe></div>
-    <div class="map-actions"><a class="btn btn-line" href="${linkSrc(q)}" target="_blank" rel="noopener">Abrir no Google Maps</a><a class="btn btn-ghost" href="${dirSrc(q)}" target="_blank" rel="noopener">Como chegar</a></div>
+    <div class="map-actions"><a class="btn btn-line" href="${dirSrc(q)}" target="_blank" rel="noopener">Ver no Google Maps e traçar rota</a></div>
     ${addr?`<p class="map-note mono">${esc(addr)}</p>`:''}</section>`;}
 
 const THEMES=[
@@ -978,6 +1016,7 @@ async function loadOwner(){
   $('#appMain').innerHTML=loadingHTML();
   state.properties=await fetchProps(state.user.id);
   if(state.route==='plans')renderPlans();
+  else if(state.route==='metrics')renderMetrics();
   else if(state.route==='leads'){state.leads=await fetchLeads();state.leadCount=state.leads.length;renderLeads();}
   else{
     sb.from('leads').select('status').eq('broker',state.user.id)
@@ -1004,7 +1043,9 @@ async function loadPublicProperty(id){$('#pubBanner').innerHTML='';$('#publicMai
   putProp(p);await fetchBroker(p.broker);renderPublicProperty(id);}
 
 /* ===================== PLANS UI ===================== */
+const SEO_DEFAULT={t:'Vittrine | Catálogo de imóveis',d:'O catálogo de imóveis do corretor, em um único link para enviar ao cliente.'};
 function navPlans(){state.route='plans';loadOwner();window.scrollTo({top:0,behavior:'smooth'});}
+function navMetrics(){state.route='metrics';loadOwner();window.scrollTo({top:0,behavior:'smooth'});}
 function renderPlans(){
   const u=state.user,used=state.properties.length,cur=planOf(u);
   $('#appMain').innerHTML=`
@@ -1131,6 +1172,49 @@ async function sendLead(propId){
 async function fetchLeads(){const {data,error}=await sb.from('leads').select('*').eq('broker',state.user.id).order('created_at',{ascending:false});
   if(error){console.error(error);return[];}return data||[];}
 function navLeads(){state.route='leads';loadOwner();window.scrollTo({top:0,behavior:'smooth'});}
+async function renderMetrics(){
+  $('#appMain').innerHTML=loadingHTML();
+  const {data,error}=await sb.rpc('my_metrics');
+  if(error||!data){$('#appMain').innerHTML='<div class="empty"><h3>Não foi possível carregar as métricas.</h3></div>';return;}
+  const m=data;const daily=m.daily||[];const maxD=Math.max(1,...daily.map(d=>d.n));
+  const bars=daily.map(d=>{const h=Math.round(d.n/maxD*90);return `<div class="mbar-col"><div class="mbar" style="height:${Math.max(3,h)}px" title="${d.n} em ${d.day}"></div><span class="mbar-lbl mono">${d.day.split('/')[0]}</span></div>`;}).join('');
+  const top=(m.top||[]).filter(t=>t.views>0);
+  $('#appMain').innerHTML=`
+  <section class="view">
+    <div class="cover-kicker" style="margin-top:46px"><span class="lead mono"><span class="sq"></span>Seu desempenho</span><span class="ln"></span><button class="mono" data-act="go-catalog" style="cursor:pointer">← Voltar</button></div>
+    <h1 class="disp" style="font-size:clamp(30px,5.5vw,54px);margin:8px 0 26px">Métricas</h1>
+    <div class="stats-row" style="margin-top:0">
+      <div class="stat"><div class="sv">${m.views_7d}</div><div class="sl mono">Visitas<small>últimos 7 dias</small></div></div>
+      <div class="stat"><div class="sv">${m.views_30d}</div><div class="sl mono">Visitas<small>últimos 30 dias</small></div></div>
+      <div class="stat"><div class="sv">${m.leads_30d}</div><div class="sl mono">Leads<small>últimos 30 dias</small></div></div>
+      <div class="stat"><div class="sv">${m.leads_new}</div><div class="sl mono">A responder<small>leads novos</small></div></div>
+    </div>
+    <div class="metric-card">
+      <div class="mono" style="font-size:12px;color:var(--ink-soft);margin-bottom:16px">VISITAS NOS ÚLTIMOS 14 DIAS</div>
+      <div class="mbar-wrap">${bars}</div>
+    </div>
+    ${top.length?`<div class="metric-card">
+      <div class="mono" style="font-size:12px;color:var(--ink-soft);margin-bottom:14px">IMÓVEIS MAIS VISTOS</div>
+      ${top.map((t,i)=>`<div class="toprow"><span class="topn mono">${i+1}</span><span class="topname">${esc(t.name)}</span><span class="topviews mono">${t.views} ${t.views===1?'visita':'visitas'}</span></div>`).join('')}
+    </div>`:'<p class="muted" style="margin-top:20px">Assim que seus imóveis começarem a receber visitas, os mais vistos aparecem aqui.</p>'}
+    <div style="margin-top:30px"><button class="btn btn-line" data-act="export-data"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;vertical-align:-3px;margin-right:6px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>Exportar meus dados</button></div>
+  </section>`;
+  observeReveals();
+}
+// ===== 12) EXPORTAR DADOS (CSV de imóveis + leads) =====
+async function exportData(){
+  toast('Preparando seu arquivo…');
+  const props=state.properties.length?state.properties:await fetchProps(state.user.id);
+  const {data:leads}=await sb.from('leads').select('*').eq('broker',state.user.id);
+  const csv=(rows,cols)=>{const esc=v=>`"${String(v==null?'':v).replace(/"/g,'""')}"`;
+    return cols.join(',')+'\n'+rows.map(r=>cols.map(c=>esc(r[c])).join(',')).join('\n');};
+  const pRows=props.map(p=>({ref:p.ref,nome:p.name,tipo:p.type,situacao:p.status,cidade:p.city,uf:p.ufp,preco:p.price,quartos:p.bedrooms,banheiros:p.bathrooms,vagas:p.parking,area:p.area,visitas:p.views}));
+  const lRows=(leads||[]).map(l=>({nome:l.name,telefone:l.phone,imovel:l.prop_name,mensagem:l.message,status:l.status,data:l.created_at}));
+  const blob=new Blob(['\ufeffIMÓVEIS\n'+csv(pRows,['ref','nome','tipo','situacao','cidade','uf','preco','quartos','banheiros','vagas','area','visitas'])+'\n\nLEADS\n'+csv(lRows,['nome','telefone','imovel','mensagem','status','data'])],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='vittrine-meus-dados.csv';a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+  toast('Arquivo baixado! Abre no Excel ou Google Planilhas.');
+}
 function fmtDate(s){const d=new Date(s);return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})+' '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});}
 const LEAD_STATUSES=[{id:'novo',name:'Novo'},{id:'contatado',name:'Contatado'},{id:'fechado',name:'Fechado'}];
 function renderLeads(){
@@ -1229,8 +1313,14 @@ function shareModal(url,msg,og){
       <img src="${qr}" alt="QR code do link" width="126" height="126" style="border-radius:8px;background:#fff;padding:4px" loading="lazy">
       <p class="muted" style="font-size:13px;max-width:34ch;margin:0">QR code do link, bom para cartão de visita, placa de "vende-se" e stories.</p>
     </div></div>`);}
-function copyUrl(){const i=$('#shareUrl');if(!i)return;i.select();i.setSelectionRange(0,9999);
-  try{navigator.clipboard.writeText(i.value);toast('Link copiado!');}catch(e){try{document.execCommand('copy');toast('Link copiado!');}catch(_){toast('Selecione e copie o link.',false);}}}
+async function copyText(text,okMsg){
+  try{await navigator.clipboard.writeText(text);toast(okMsg||'Copiado!');return;}catch(e){}
+  // fallback universal: textarea temporário + execCommand
+  try{const ta=document.createElement('textarea');ta.value=text;ta.setAttribute('readonly','');
+    ta.style.position='fixed';ta.style.top='-1000px';document.body.appendChild(ta);
+    ta.select();ta.setSelectionRange(0,text.length);document.execCommand('copy');document.body.removeChild(ta);
+    toast(okMsg||'Copiado!');}catch(_){toast('Não consegui copiar automaticamente. Toque e segure para copiar.',false);}}
+function copyUrl(){const i=$('#shareUrl');if(i)copyText(i.value,'Link copiado!');}
 function askDelete(id){const p=state.properties.find(x=>x.id===id);if(!p)return;closeCardMenus();
   openModal(`<div class="modal-head"><h3>Excluir imóvel</h3><button class="icon-btn" data-act="close-modal" style="width:34px;height:34px" aria-label="Fechar">✕</button></div>
     <div class="modal-body"><p style="margin-top:0;font-size:15px">Tem certeza que deseja excluir <strong>${esc(p.name)}</strong>? Esta ação não pode ser desfeita.</p></div>
@@ -1266,7 +1356,7 @@ function renderCatalog(){
           <h1 class="cover-name wipe">${esc(u.name)}</h1>
           ${avatarHTML(u,100,8,'cover-portrait')}
         </div>
-        ${u.bio?`<p class="cover-bio">${esc(u.bio)}</p>`:''}
+        ${u.bio?`<p class="cover-bio" style="white-space:pre-line">${esc(u.bio)}</p>`:''}
         ${metaHTML(u,props.length)}
         ${u.handle?`<div class="pub-link mono" data-act="share-profile" data-id="${u.id}" title="Compartilhar">Seu link · /#/${esc(u.handle)} <span>copiar</span></div>`:''}
         <div class="cover-actions">
@@ -1286,6 +1376,39 @@ function renderCatalog(){
     ${props.length>=2?ownerFilterBar():''}
     <div class="grid" id="ownGrid">${props.length?props.map((p,i)=>entryHTML(p,i)).join(''):emptyHTML()}</div>
   </section>`;
+  setTimeout(maybeTour,600);
+}
+function maybeTour(){
+  try{if(sessionStorage.getItem('vt_tour'))return;}catch(e){}
+  // só mostra se o corretor já tem pelo menos o painel montado
+  const steps=[
+    {sel:'[data-act="nav-add"]',title:'Adicione seu primeiro imóvel',text:'Fotos, valor, mapa e até vídeo. Leva uns minutos.'},
+    {sel:'.stat[data-act="nav-leads"]',title:'Seus contatos chegam aqui',text:'Quando um cliente demonstra interesse, o lead aparece nos Leads.'},
+    {sel:'[data-act="nav-edit-profile"]',title:'Seu link para compartilhar',text:'Personalize seu link e mande no WhatsApp, bio do Instagram, placa...'},
+  ].filter(st=>document.querySelector(st.sel));
+  if(!steps.length)return;
+  let i=0;
+  const ov=document.createElement('div');ov.className='tour-ov';document.body.appendChild(ov);
+  function show(){
+    const st=steps[i];const el=document.querySelector(st.sel);
+    if(!el){next();return;}
+    const r=el.getBoundingClientRect();
+    el.scrollIntoView({block:'center',behavior:'smooth'});
+    setTimeout(()=>{
+      const rr=el.getBoundingClientRect();
+      ov.innerHTML=`<div class="tour-hole" style="top:${rr.top-6}px;left:${rr.left-6}px;width:${rr.width+12}px;height:${rr.height+12}px"></div>
+        <div class="tour-card" style="top:${Math.min(window.innerHeight-180,rr.bottom+14)}px;left:${Math.max(14,Math.min(window.innerWidth-300,rr.left))}px">
+          <div class="tour-step mono">${i+1} de ${steps.length}</div>
+          <strong>${st.title}</strong><p>${st.text}</p>
+          <div class="tour-nav"><button class="tour-skip" data-tour="skip">Pular</button><button class="btn btn-primary" data-tour="next" style="padding:8px 16px">${i===steps.length-1?'Entendi!':'Próximo'}</button></div>
+        </div>`;
+    },350);
+  }
+  function next(){i++;if(i>=steps.length)finish();else show();}
+  function finish(){ov.remove();try{sessionStorage.setItem('vt_tour','1');}catch(e){}}
+  ov.addEventListener('click',e=>{const a=e.target.closest('[data-tour]');if(!a)return;
+    if(a.dataset.tour==='skip')finish();else next();});
+  show();
 }
 function statsHTML(props){
   const views=props.reduce((a,p)=>a+(p.views||0),0);
@@ -1403,7 +1526,7 @@ function detailBody(p,u,isPublic){
           :`<div class="video-wrap reveal" style="margin-top:18px"><video controls preload="metadata" playsinline src="${esc(p.video)}"></video></div>`):''}
       </div>
       <aside class="fiche reveal" style="transition-delay:90ms">
-        <div class="fiche-kicker mono">${p.status&&p.status!=='disponivel'?`<span class="status-pill status-${p.status}">${statusName(p.status)}</span> · `:''}${p.trade?'Aceita permuta':'À venda'}</div>
+        <div class="fiche-kicker mono">${p.status&&p.status!=='disponivel'?`<span class="status-pill status-${p.status}">${statusName(p.status)}</span> · `:''}${p.trade?'Aceita permuta':'À venda'}${isPublic&&(p.views||0)>=10?`<span class="viewbadge">👁 ${p.views} pessoas viram</span>`:''}</div>
         <h1>${esc(p.name)}</h1>
         <div class="fiche-price">${BRL(p.price)}</div>
         ${specTable(p)}
@@ -1432,9 +1555,14 @@ function ownerBanner(brokerId){
   if(!(state.user&&state.user.id===brokerId))return '';
   return `<div class="preview-banner"><span>👁 Pré-visualização do cliente</span><button data-act="exit-preview">Voltar ao painel</button></div>`;
 }
+function setSEO(title,desc){
+  document.title=title;
+  let m=document.querySelector('meta[name="description"]');if(m)m.content=desc;
+}
 function renderPublicProfile(id){
   const u=state.brokers.find(b=>b.id===id);
   if(!u){return notFound();}
+  setSEO(`${u.name} | Catálogo de imóveis`, `Veja os imóveis de ${u.name}${u.region?' em '+u.region:''}. Fotos, valores e contato direto no WhatsApp.`);
   applyThemeRaw(u.theme,u.accent);state.pubBrokerId=id;
   const props=state.properties.filter(p=>p.broker===id);
   const init=(u.name||'?').trim().split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase();
@@ -1446,7 +1574,7 @@ function renderPublicProfile(id){
       <div class="panel-inner">
         <div class="cover-kicker"><span class="lead mono"><span class="sq"></span>Corretor de imóveis</span><span class="ln"></span><span class="mono">Vitrine</span></div>
         <div class="cover-head"><h1 class="cover-name wipe">${esc(u.name)}</h1>${avatarHTML(u,100,8,'cover-portrait')}</div>
-        ${u.bio?`<p class="cover-bio">${esc(u.bio)}</p>`:''}
+        ${u.bio?`<p class="cover-bio" style="white-space:pre-line">${esc(u.bio)}</p>`:''}
         ${metaHTML(u,props.length)}
         <div class="cover-actions">
           <a class="btn btn-primary" href="${waLink(u,null)}" target="_blank" rel="noopener">Falar no WhatsApp</a>
@@ -1458,7 +1586,11 @@ function renderPublicProfile(id){
     <div class="index-head"><h2>Catálogo</h2><span class="cnt" id="pubCount">${pad(props.length)} ${props.length===1?'imóvel':'imóveis'}</span></div>
     ${props.length>=2?publicFilterBar(props):''}
     <div class="grid" id="pubGrid">${props.length?props.map((p,i)=>entryPublicHTML(p,i)).join(''):'<div class="empty"><h3>Nenhum imóvel publicado ainda.</h3></div>'}</div>
-  </section>`;
+  </section>
+  <a class="wa-float" href="${waLink(u,null)}" target="_blank" rel="noopener" aria-label="Falar no WhatsApp">
+    <svg viewBox="0 0 24 24" fill="currentColor" width="26" height="26"><path d="M17.5 14.4c-.3-.15-1.77-.87-2.04-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.48-.89-.79-1.49-1.77-1.66-2.07-.17-.3-.02-.46.13-.61.13-.13.3-.35.44-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51l-.57-.01c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.48 0 1.46 1.07 2.87 1.22 3.07.15.2 2.1 3.2 5.08 4.49.71.31 1.26.49 1.69.62.71.23 1.36.2 1.87.12.57-.09 1.77-.72 2.02-1.42.25-.7.25-1.3.17-1.42-.07-.12-.27-.2-.57-.35zM12 2a10 10 0 0 0-8.6 15.06L2 22l4.94-1.3A10 10 0 1 0 12 2z"/></svg>
+    <span>Falar agora</span>
+  </a>`;
   state.pubProps=props;
   observeReveals();window.scrollTo(0,0);
 }
@@ -1493,6 +1625,7 @@ function renderPublicProperty(id){
   const p=state.properties.find(x=>x.id===id);
   if(!p){return notFound();}
   const u=state.brokers.find(b=>b.id===p.broker);
+  setSEO(`${p.name} — ${BRL(p.price)}`, `${p.name}${p.city?' em '+p.city:''}. ${p.bedrooms?p.bedrooms+' quartos, ':''}${p.area?p.area+'m². ':''}Fale com ${u?u.name:'o corretor'} no WhatsApp.`);
   applyThemeRaw(u&&u.theme,u&&u.accent);state.currentId=id;state.pubBrokerId=p.broker;carIndex=0;
   if(!(state.user&&state.user.id===p.broker)){try{sb.rpc('bump_view',{pid:id});}catch(e){}}
   $('#pubBanner').innerHTML=ownerBanner(p.broker);
@@ -1556,7 +1689,7 @@ $('#lightbox').addEventListener('click',e=>{if(e.target.id==='lightbox')closeLig
 /* ===================== MODALS ===================== */
 function openModal(h){$('#modal').innerHTML=h;$('#overlay').classList.add('open');document.body.style.overflow='hidden';}
 function closeModal(){$('#overlay').classList.remove('open');document.body.style.overflow='';}
-$('#overlay').addEventListener('click',e=>{if(e.target.id==='overlay')closeModal();});
+// clicar fora NÃO fecha (evita perder preenchimento sem querer); só o X/Cancelar fecham
 let formBuf={cover:null,gallery:[],avatar:null};
 
 function openPropertyModal(editId){
@@ -1581,10 +1714,10 @@ function openPropertyModal(editId){
         <input class="inp" id="pMapLink" placeholder="Link do Google Maps ou -16.70, -49.27 (opcional)" value="${p?esc(p.mapLink||''):''}" style="margin-bottom:10px">
         <button type="button" class="btn btn-ghost" data-act="map-preview" style="margin-bottom:12px">Atualizar mapa</button>
         <div class="map-frame map-prev" id="mapPrev"></div></div>
-      <div class="field"><label>Valor (R$)</label><input class="inp" id="pPrice" type="number" inputmode="numeric" placeholder="1250000" value="${p?p.price:''}"></div>
+      <div class="field"><label>Valor (R$)</label><input class="inp" id="pPrice" type="text" inputmode="numeric" placeholder="R$ 1.250.000" value="${p&&p.price?'R$ '+Number(p.price).toLocaleString('pt-BR'):''}"></div>
       <div class="field"><label>Detalhes <span class="hint">(opcional)</span></label>
-        <div class="row2"><input class="inp" id="pBed" type="number" placeholder="Quartos" value="${p&&p.bedrooms?p.bedrooms:''}"><input class="inp" id="pBath" type="number" placeholder="Banheiros" value="${p&&p.bathrooms?p.bathrooms:''}"></div>
-        <div class="row2" style="margin-top:11px"><input class="inp" id="pPark" type="number" placeholder="Vagas" value="${p&&p.parking?p.parking:''}"><input class="inp" id="pArea" type="number" placeholder="Área (m²)" value="${p&&p.area?p.area:''}"></div>
+        <div class="row2"><input class="inp" id="pBed" type="text" inputmode="numeric" placeholder="Quartos" value="${p&&p.bedrooms?p.bedrooms:''}"><input class="inp" id="pBath" type="text" inputmode="numeric" placeholder="Banheiros" value="${p&&p.bathrooms?p.bathrooms:''}"></div>
+        <div class="row2" style="margin-top:11px"><input class="inp" id="pPark" type="text" inputmode="numeric" placeholder="Vagas" value="${p&&p.parking?p.parking:''}"><input class="inp" id="pArea" type="text" inputmode="numeric" placeholder="Área (m²)" value="${p&&p.area?p.area:''}"></div>
       </div>
       <div class="field"><label>Descrição <span class="hint">(opcional)</span></label><textarea class="inp" id="pDesc" placeholder="Conte o que torna esse imóvel especial...">${p?esc(p.desc):''}</textarea></div>
       <div class="field"><label class="check ${p&&p.trade?'on':''}" id="tradeCheck" data-act="toggle-trade" style="text-transform:none;letter-spacing:0;font-family:var(--font);font-size:inherit"><span class="box">${I.check}</span><span class="txt"><strong>Aceita permuta</strong><small>Exibe um selo no imóvel</small></span></label></div>
@@ -1636,7 +1769,7 @@ function readOne(f,cb){if(!f)return;const r=new FileReader();r.onload=()=>cb(r.r
 async function saveProperty(editId){
   const v=id=>$(id).value.trim();
   const name=v('#pName');if(!name){toast('Dê um nome ao imóvel.',false);return;}
-  const btn=document.querySelector('[data-act="save-property"]');if(btn){btn.disabled=true;btn.textContent='Salvando…';}
+  const btn=document.querySelector('[data-act="save-property"]');if(btn){btn.disabled=true;btn.textContent=editId?'Salvando…':'Adicionando…';}
   try{
     let video='';
     if(planOf(state.user).id!=='free'){
@@ -1653,7 +1786,7 @@ async function saveProperty(editId){
     const cover=await uploadMaybe(formBuf.cover);
     const gallery=[];for(const g of formBuf.gallery){gallery.push(await uploadMaybe(g));}
     const obj={name,street:v('#pStreet'),neighborhood:v('#pNeigh'),city:v('#pCity'),ufp:v('#pUf').toUpperCase(),
-      price:Number($('#pPrice').value)||0,bedrooms:Number($('#pBed').value)||0,bathrooms:Number($('#pBath').value)||0,
+      price:Number(($('#pPrice').value||'').replace(/[^0-9]/g,''))||0,bedrooms:Number($('#pBed').value)||0,bathrooms:Number($('#pBath').value)||0,
       parking:Number($('#pPark').value)||0,area:Number($('#pArea').value)||0,desc:v('#pDesc'),
       mapLink:v('#pMapLink'),coords:parseCoords(v('#pMapLink')),
       trade:$('#tradeCheck').classList.contains('on'),display:document.querySelector('.seg-opt.on[data-d]')?.dataset.d||'grid',type:$('#pType')?$('#pType').value:'',status:$('#pStatus')?$('#pStatus').value:'disponivel',
@@ -1723,6 +1856,8 @@ document.addEventListener('click',e=>{
     case 'go-catalog':goCatalog();break;
     case 'nav-add':closeMenu();if(!canAdd()){upgradeModal();}else{openPropertyModal();}break;
     case 'nav-plans':closeMenu();navPlans();break;
+    case 'nav-metrics':closeMenu();navMetrics();break;
+    case 'export-data':exportData();break;
     case 'nav-leads':closeMenu();navLeads();break;
     case 'lead-open':leadModal(t.dataset.id);break;
     case 'lead-send':sendLead(t.dataset.id);break;
@@ -1732,7 +1867,7 @@ document.addEventListener('click',e=>{
     case 'sub-card':subCard(t.dataset.id);break;
     case 'sub-cancel':subCancelModal();break;
     case 'sub-cancel-confirm':subCancel();break;
-    case 'copy-brcode':{const i=$('#brCode');i.select();navigator.clipboard.writeText(i.value).then(()=>toast('Código Pix copiado.')).catch(()=>{document.execCommand('copy');toast('Código Pix copiado.');});break;}
+    case 'copy-brcode':{const i=$('#brCode');if(i)copyText(i.value,'Código Pix copiado.');break;}
     case 'go-plans-modal':closeModal();navPlans();break;
     case 'nav-edit-profile':closeMenu();openProfileModal();break;
     case 'nav-logout':logout();break;
@@ -1792,6 +1927,12 @@ document.addEventListener('keydown',e=>{
 $('#loginPass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
 document.addEventListener('input',e=>{if(e.target&&e.target.id==='ownSearch'){state.ownQ=e.target.value;applyOwnerFilters();}});
 document.addEventListener('change',e=>{if(e.target&&e.target.id==='ownStatus'){state.ownSt=e.target.value;applyOwnerFilters();}});
+document.addEventListener('input',e=>{const id=e.target&&e.target.id;
+  if(id==='pBed'||id==='pBath'||id==='pPark'||id==='pArea'){
+    e.target.value=e.target.value.replace(/[^0-9]/g,'');}
+  else if(id==='pPrice'){
+    const n=e.target.value.replace(/[^0-9]/g,'');
+    e.target.value=n?'R$ '+Number(n).toLocaleString('pt-BR'):'';}});
 document.addEventListener('change',e=>{if(e.target&&e.target.id==='vidInput'){const f=e.target.files[0];if(!f)return;
   if(f.size>52428800){toast('O vídeo passa de 50 MB. Escolha um menor.',false);e.target.value='';return;}
   formBuf.videoFile=f;formBuf.videoExisting='';
@@ -1830,6 +1971,45 @@ async function init(){
   route();
 }
 init();
+</script>
+<script>
+/* PWA: manifest e service worker embutidos (deploy single-file) */
+(function(){
+  try{
+    const manifest={
+      name:'Vittrine',short_name:'Vittrine',
+      description:'Seu catálogo de imóveis em um único link.',
+      start_url:'.',display:'standalone',
+      background_color:'#0D0D0C',theme_color:'#0D0D0C',
+      icons:[
+        {src:'https://lbdjqtvcnychbrlhzwue.supabase.co/storage/v1/object/public/photos/brand/icon-192.png',sizes:'192x192',type:'image/png',purpose:'any maskable'},
+        {src:'https://lbdjqtvcnychbrlhzwue.supabase.co/storage/v1/object/public/photos/brand/icon-512.png',sizes:'512x512',type:'image/png',purpose:'any maskable'}
+      ]
+    };
+    const blob=new Blob([JSON.stringify(manifest)],{type:'application/manifest+json'});
+    const link=document.createElement('link');link.rel='manifest';link.href=URL.createObjectURL(blob);
+    document.head.appendChild(link);
+    // service worker mínimo: cache-first do próprio app shell, para abrir offline
+    if('serviceWorker' in navigator){
+      const sw=`
+        const C='vittrine-v1';
+        self.addEventListener('install',e=>{self.skipWaiting();});
+        self.addEventListener('activate',e=>{e.waitUntil(clients.claim());});
+        self.addEventListener('fetch',e=>{
+          const u=new URL(e.request.url);
+          if(e.request.mode==='navigate'){
+            e.respondWith(fetch(e.request).catch(()=>caches.match('/')));
+            return;
+          }
+        });`;
+      const swBlob=new Blob([sw],{type:'text/javascript'});
+      navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(()=>{});
+    }
+    // captura o evento de instalação para oferecer botão próprio
+    window.addEventListener('beforeinstallprompt',ev=>{ev.preventDefault();window.__deferredPrompt=ev;
+      const b=document.getElementById('installBtn');if(b)b.style.display='';});
+  }catch(e){}
+})();
 </script>
 </body>
 </html>
