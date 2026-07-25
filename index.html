@@ -505,6 +505,11 @@ textarea.inp{resize:vertical;min-height:80px;line-height:1.5}
 .vtab.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 .vid-current{font-size:12px;color:var(--ink-soft);margin-bottom:10px}
 .lnk{background:none;border:none;color:var(--accent-strong);cursor:pointer;text-decoration:underline;font:inherit;padding:0}
+.confirm-box{text-align:center;padding:12px 4px}
+.confirm-icon{width:58px;height:58px;border-radius:50%;background:var(--accent-soft);color:var(--accent-strong);display:grid;place-items:center;font-size:26px;margin:0 auto 16px}
+.confirm-steps{text-align:left;margin:0;padding-left:20px;color:var(--ink-soft);font-size:14px;line-height:1.9}
+.confirm-steps li{padding-left:4px}
+.sublbl{display:block;font-size:11.5px;color:var(--ink-soft);margin-bottom:5px;letter-spacing:.02em}
 .metric-card{background:var(--surface);border:1.5px solid var(--line-strong);border-radius:12px;padding:22px 24px;margin-top:20px}
 .mbar-wrap{display:flex;align-items:flex-end;gap:6px;height:110px}
 .mbar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;justify-content:flex-end}
@@ -720,6 +725,23 @@ textarea.inp{resize:vertical;min-height:80px;line-height:1.5}
       <div class="demo-note">Primeira vez? Crie sua conta na aba <b>Criar conta</b>.</div>
     </div>
 
+    <div id="paneConfirm" class="hidden">
+      <div class="confirm-box">
+        <div class="confirm-icon">✉</div>
+        <h3 class="disp" style="font-size:23px;margin:0 0 8px">Falta um passo: confirme seu e-mail</h3>
+        <p class="muted" style="margin:0 0 18px;font-size:14.5px">Enviamos um link de confirmação para<br><strong id="confirmEmail" style="color:var(--accent-strong)"></strong></p>
+        <ol class="confirm-steps">
+          <li>Abra sua caixa de entrada</li>
+          <li>Clique no link do e-mail que enviamos</li>
+          <li>Volte aqui e entre com seu e-mail e senha</li>
+        </ol>
+        <p class="mono" style="font-size:11px;color:var(--ink-faint);text-transform:none;letter-spacing:.02em;margin:16px 0 0">Não chegou em alguns minutos? Verifique a caixa de spam ou promoções.</p>
+        <div style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn btn-primary" data-act="confirm-goto-login">Já confirmei, quero entrar</button>
+          <button class="btn btn-ghost" data-act="confirm-resend">Reenviar e-mail</button>
+        </div>
+      </div>
+    </div>
     <div id="paneSignup" class="hidden">
       <h2 class="auth-title">Crie sua conta</h2>
       <p class="auth-desc">Leva menos de um minuto.</p>
@@ -732,7 +754,7 @@ textarea.inp{resize:vertical;min-height:80px;line-height:1.5}
         </div>
       </div>
       <div class="row2">
-        <div class="field" data-f="region"><label>Região de atuação</label><input class="inp" id="suRegion"><div class="errline">Informe a região.</div></div>
+        <div class="field" data-f="region"><label>Cidade</label><input class="inp" id="suRegion"><div class="errline">Informe a cidade.</div></div>
         <div class="field"><label>Imobiliária <span class="hint">(opcional)</span></label><input class="inp" id="suAgency"></div>
       </div>
       <div class="field" data-f="email"><label>E-mail</label><input class="inp" id="suEmail" type="email"><div class="errline">E-mail inválido.</div></div>
@@ -842,16 +864,16 @@ const sb=window.supabase.createClient(SB_URL,SB_KEY);
 
 function rowToProp(r){return {id:r.id,broker:r.broker,ref:r.ref,name:r.name,street:r.street||'',neighborhood:r.neighborhood||'',
   city:r.city||'',ufp:r.ufp||'',price:Number(r.price)||0,trade:!!r.trade,bedrooms:r.bedrooms||0,bathrooms:r.bathrooms||0,
-  parking:r.parking||0,area:r.area||0,desc:r.description||'',display:r.display||'grid',cover:r.cover,type:r.type||'',status:r.status||'disponivel',views:r.views||0,video:r.video||'',
+  parking:r.parking||0,area:r.area||0,desc:r.description||'',display:r.display||'grid',cover:r.cover,type:r.type||'',status:r.status||'disponivel',views:r.views||0,video:r.video||'',pos:r.pos,
   gallery:Array.isArray(r.gallery)?r.gallery:[],coords:r.coords||null,mapLink:r.map_link||''};}
 function propToRow(p){return {ref:p.ref,name:p.name,street:p.street,neighborhood:p.neighborhood,city:p.city,ufp:p.ufp,
   price:p.price,trade:p.trade,bedrooms:p.bedrooms,bathrooms:p.bathrooms,parking:p.parking,area:p.area,type:p.type,status:p.status,
-  description:p.desc,display:p.display,cover:p.cover,gallery:p.gallery,coords:p.coords,map_link:p.mapLink,video:p.video||''};}
+  description:p.desc,display:p.display,cover:p.cover,gallery:p.gallery,coords:p.coords,map_link:p.mapLink,video:p.video||'',pos:p.pos};}
 function cacheBroker(b){if(!b)return;const i=state.brokers.findIndex(x=>x.id===b.id);if(i>=0)state.brokers[i]=b;else state.brokers.push(b);}
 function putProp(p){const i=state.properties.findIndex(x=>x.id===p.id);if(i>=0)state.properties[i]=p;else state.properties.push(p);}
 async function fetchBroker(id){const {data,error}=await sb.from('brokers').select('*').eq('id',id).maybeSingle();
   if(error)console.error(error);if(data)cacheBroker(data);return data;}
-async function fetchProps(brokerId){const {data,error}=await sb.from('properties').select('*').eq('broker',brokerId).order('created_at',{ascending:false});
+async function fetchProps(brokerId){const {data,error}=await sb.from('properties').select('*').eq('broker',brokerId).order('pos',{ascending:true,nullsFirst:false}).order('created_at',{ascending:false});
   if(error)console.error(error);return (data||[]).map(rowToProp);}
 async function fetchProp(id){const {data,error}=await sb.from('properties').select('*').eq('id',id).maybeSingle();
   if(error)console.error(error);return data?rowToProp(data):null;}
@@ -908,6 +930,25 @@ const OG_URL='https://lbdjqtvcnychbrlhzwue.supabase.co/functions/v1/og';
 const STATUSES=[{id:'disponivel',name:'Disponível'},{id:'reservado',name:'Reservado'},{id:'vendido',name:'Vendido'}];
 const statusName=id=>(STATUSES.find(s=>s.id===id)||STATUSES[0]).name;
 function ytId(u){if(!u)return null;const m=String(u).match(/(?:youtube\.com\/(?:watch\?(?:.*&)?v=|shorts\/|embed\/)|youtu\.be\/)([\w-]{11})/);return m?m[1]:null;}
+async function moveProp(id,dir){
+  const list=myProps();
+  const i=list.findIndex(x=>x.id===id);
+  const j=i+dir;
+  if(i<0||j<0||j>=list.length){toast(dir<0?'Já é o primeiro da lista.':'Já é o último da lista.');return;}
+  const a=list[i],b=list[j];
+  // troca as posições no banco
+  const pa=a.pos??(i+1), pb=b.pos??(j+1);
+  const [r1,r2]=await Promise.all([
+    sb.from('properties').update({pos:pb}).eq('id',a.id),
+    sb.from('properties').update({pos:pa}).eq('id',b.id)
+  ]);
+  if(r1.error||r2.error){console.error(r1.error||r2.error);toast('Não foi possível reordenar.',false);return;}
+  a.pos=pb;b.pos=pa;
+  state.properties.sort((x,y)=>(x.pos??999)-(y.pos??999));
+  closeCardMenus&&closeCardMenus();
+  renderCatalog();observeReveals();
+  toast('Ordem atualizada.');
+}
 async function quickStatus(id,st){
   const {error}=await sb.from('properties').update({status:st}).eq('id',id);
   if(error){console.error(error);toast('Não foi possível atualizar.',false);return;}
@@ -918,7 +959,7 @@ async function quickStatus(id,st){
 async function dupProp(id){
   const p=state.properties.find(x=>x.id===id);if(!p)return;
   if(!canAdd()){upgradeModal();return;}
-  const row=propToRow(p);row.broker=state.user.id;row.name=p.name+' (cópia)';
+  const row=propToRow(p);row.broker=state.user.id;row.name=p.name+' (cópia)';row.pos=Math.min(0,...(state.properties.map(x=>x.pos??1)))-1;
   row.ref='VT-'+Math.random().toString(36).slice(2,6).toUpperCase();row.status='disponivel';
   const {data,error}=await sb.from('properties').insert(row).select().single();
   if(error||!data){console.error(error);toast('Não foi possível duplicar.',false);return;}
@@ -958,9 +999,20 @@ let io;function observeReveals(){if(io)io.disconnect();
   document.querySelectorAll('.reveal:not(.in)').forEach(n=>io.observe(n));}
 
 /* ===================== AUTH ===================== */
-function switchAuthTab(tab){$('#authTabs').dataset.on=tab;
-  document.querySelectorAll('#authTabs .tab').forEach(b=>b.classList.toggle('on',b.dataset.tab===tab));
-  $('#paneLogin').classList.toggle('hidden',tab!=='login');$('#paneSignup').classList.toggle('hidden',tab!=='signup');}
+function switchAuthTab(tab){
+  const isConfirm=tab==='confirm';
+  $('#authTabs').style.display=isConfirm?'none':'';
+  if(!isConfirm){$('#authTabs').dataset.on=tab;
+    document.querySelectorAll('#authTabs .tab').forEach(b=>b.classList.toggle('on',b.dataset.tab===tab));}
+  $('#paneLogin').classList.toggle('hidden',tab!=='login');
+  $('#paneSignup').classList.toggle('hidden',tab!=='signup');
+  $('#paneConfirm').classList.toggle('hidden',!isConfirm);}
+async function resendConfirm(){
+  const email=state.pendingEmail;if(!email)return;
+  const b=document.querySelector('[data-act="confirm-resend"]');if(b){b.disabled=true;b.textContent='Enviando…';}
+  const {error}=await sb.auth.resend({type:'signup',email});
+  if(b){b.disabled=false;b.textContent='Reenviar e-mail';}
+  toast(error?'Não foi possível reenviar agora. Tente em instantes.':'E-mail reenviado! Confira sua caixa de entrada.',!error);}
 async function doLogin(){const email=$('#loginEmail').value.trim().toLowerCase(),pass=$('#loginPass').value;
   if(!email||!pass){toast('Informe e-mail e senha.',false);return;}
   const btn=document.querySelector('[data-act="do-login"]');if(btn){btn.disabled=true;btn.textContent='Entrando…';}
@@ -980,7 +1032,8 @@ async function doSignup(){const g=id=>$(id).value.trim();
   if(btn){btn.disabled=false;btn.textContent='Criar conta →';}
   if(error){toast(/registered|already/i.test(error.message)?'Esse e-mail já tem conta.':('Erro: '+error.message),false);if(/registered|already/i.test(error.message))fieldErr('email',true);return;}
   if(data.session){await loginAfterAuth(data.user);}
-  else{toast('Conta criada! Confirme pelo link enviado ao seu e-mail.');switchAuthTab('login');$('#loginEmail').value=email;}}
+  else{state.pendingEmail=email;$('#confirmEmail').textContent=email;$('#loginEmail').value=email;
+    switchAuthTab('confirm');window.scrollTo({top:0,behavior:'smooth'});}}
 async function loginAfterAuth(user){
   let b=await fetchBroker(user.id);
   if(!b){await new Promise(r=>setTimeout(r,600));b=await fetchBroker(user.id);} // wait for trigger
@@ -1303,19 +1356,10 @@ function toggleCardMenu(id){const m=$('#cm-'+id);if(!m)return;const willOpen=!m.
 document.addEventListener('click',e=>{if(!e.target.closest('.menu-wrap'))closeMenu();if(!e.target.closest('.card-menu-wrap'))closeCardMenus();});
 
 /* ===================== SHARE / DELETE ===================== */
-function shareLink(hash,title,msg,og){const url=location.origin+location.pathname+hash;
-  if(navigator.share){navigator.share({title,text:msg||'',url:og||url}).catch(()=>shareModal(url,msg,og));}else shareModal(url,msg,og);}
-function shareModal(url,msg,og){
-  const wa='https://wa.me/?text='+encodeURIComponent((msg?msg+'\n':'')+(og||url));
-  const qr='https://api.qrserver.com/v1/create-qr-code/?size=210x210&margin=8&data='+encodeURIComponent(url);
-  openModal(`<div class="modal-head"><h3>Compartilhar</h3><button class="icon-btn" data-act="close-modal" style="width:34px;height:34px" aria-label="Fechar">✕</button></div>
-    <div class="modal-body">
-    <div style="display:flex;gap:10px;margin-top:2px"><input class="inp" id="shareUrl" value="${esc(url)}" readonly><button class="btn btn-line" data-act="copy-url">Copiar</button></div>
-    <a class="btn btn-primary btn-block" style="margin-top:12px" href="${wa}" target="_blank" rel="noopener">Enviar no WhatsApp ${msg?'com mensagem pronta':''}</a>
-    <div style="display:flex;align-items:center;gap:16px;margin-top:18px;flex-wrap:wrap">
-      <img src="${qr}" alt="QR code do link" width="126" height="126" style="border-radius:8px;background:#fff;padding:4px" loading="lazy">
-      <p class="muted" style="font-size:13px;max-width:34ch;margin:0">QR code do link, bom para cartão de visita, placa de "vende-se" e stories.</p>
-    </div></div>`);}
+function shareLink(hash,title,msg,og){
+  // copia direto o link limpo do site (é o que o corretor manda pro cliente)
+  const url=location.origin+location.pathname+hash;
+  copyText(url,'Link copiado! É só colar no WhatsApp.');}
 async function copyText(text,okMsg){
   try{await navigator.clipboard.writeText(text);toast(okMsg||'Copiado!');return;}catch(e){}
   // fallback universal: textarea temporário + execCommand
@@ -1323,7 +1367,6 @@ async function copyText(text,okMsg){
     ta.style.position='fixed';ta.style.top='-1000px';document.body.appendChild(ta);
     ta.select();ta.setSelectionRange(0,text.length);document.execCommand('copy');document.body.removeChild(ta);
     toast(okMsg||'Copiado!');}catch(_){toast('Não consegui copiar automaticamente. Toque e segure para copiar.',false);}}
-function copyUrl(){const i=$('#shareUrl');if(i)copyText(i.value,'Link copiado!');}
 function askDelete(id){const p=state.properties.find(x=>x.id===id);if(!p)return;closeCardMenus();
   openModal(`<div class="modal-head"><h3>Excluir imóvel</h3><button class="icon-btn" data-act="close-modal" style="width:34px;height:34px" aria-label="Fechar">✕</button></div>
     <div class="modal-body"><p style="margin-top:0;font-size:15px">Tem certeza que deseja excluir <strong>${esc(p.name)}</strong>? Esta ação não pode ser desfeita.</p></div>
@@ -1366,7 +1409,7 @@ function renderCatalog(){
           <button class="btn btn-primary" data-act="nav-add">${I.plus} Adicionar imóvel</button>
           <button class="btn btn-line" data-act="nav-edit-profile">Editar perfil</button>
           <button class="btn btn-ghost" data-act="preview-profile" data-id="${u.id}">Ver perfil público</button>
-          <button class="btn btn-ghost" data-act="share-profile" data-id="${u.id}">Compartilhar</button>
+          <button class="btn btn-ghost" data-act="share-profile" data-id="${u.id}">Copiar link</button>
         </div>
       </div>
     </div>
@@ -1461,7 +1504,10 @@ function entryHTML(p,i){
     <div class="card-menu" id="cm-${p.id}">
       <button data-act="edit-prop" data-id="${p.id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg> Editar</button>
       <button data-act="preview-prop" data-id="${p.id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg> Ver como cliente</button>
-      <button data-act="share-prop" data-id="${p.id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5 8.6 10.5"/></svg> Compartilhar</button>
+      <button data-act="share-prop" data-id="${p.id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5 8.6 10.5"/></svg> Copiar link</button>
+      <button data-act="move-prop" data-id="${p.id}" data-d="-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m18 15-6-6-6 6"/></svg> Mover para cima</button>
+      <button data-act="move-prop" data-id="${p.id}" data-d="1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg> Mover para baixo</button>
+      <div class="sep"></div>
       <button data-act="dup-prop" data-id="${p.id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Duplicar</button>
       <div class="sep"></div>
       <div class="cm-status mono">Situação</div>
@@ -1501,7 +1547,7 @@ function emptyHTML(){const u=state.user;
     <h3 class="disp" style="font-size:24px;margin:0 0 18px">Sua vitrine em 3 passos</h3>
     <div class="ob-step"><span class="ob-n mono">1</span><div><strong>Cadastre seu primeiro imóvel</strong><p>Fotos, valor, mapa e detalhes. Leva uns 3 minutos.</p><button class="btn btn-primary" data-act="nav-add" style="margin-top:8px">${I.plus} Adicionar imóvel</button></div></div>
     <div class="ob-step ${u.handle?'ob-done':''}"><span class="ob-n mono">${u.handle?'✓':'2'}</span><div><strong>Confira seu link</strong><p>${u.handle?`Pronto: <span style="color:var(--accent-strong)">/#/${esc(u.handle)}</span> — dá para mudar em Editar perfil.`:'Seu link personalizado é criado no primeiro acesso.'}</p></div></div>
-    <div class="ob-step"><span class="ob-n mono">3</span><div><strong>Compartilhe com clientes</strong><p>Mande o link no WhatsApp e receba contatos na aba Leads.</p><button class="btn btn-line" data-act="share-profile" data-id="${u.id}" style="margin-top:8px">Compartilhar meu link</button></div></div>
+    <div class="ob-step"><span class="ob-n mono">3</span><div><strong>Compartilhe com clientes</strong><p>Mande o link no WhatsApp e receba contatos na aba Leads.</p><button class="btn btn-line" data-act="share-profile" data-id="${u.id}" style="margin-top:8px">Copiar meu link</button></div></div>
   </div>`;}
 function fallbackImg(name){const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600"><rect width="800" height="600" fill="#161613"/><text x="400" y="312" font-family="sans-serif" font-size="30" fill="#FFC829" text-anchor="middle">${esc(name||'Imóvel')}</text></svg>`;return 'data:image/svg+xml;utf8,'+encodeURIComponent(svg);}
 
@@ -1516,10 +1562,10 @@ function detailBody(p,u,isPublic){
   const cta=isPublic
     ? `<a class="btn btn-primary" style="flex:1;justify-content:center;min-width:170px" href="${waLink(u,p)}" target="_blank" rel="noopener">Falar no WhatsApp</a>
        <button class="btn btn-line" data-act="lead-open" data-id="${p.id}">Tenho interesse</button>
-       <button class="btn btn-ghost" data-act="share-prop" data-id="${p.id}">Compartilhar</button>`
+       <button class="btn btn-ghost" data-act="share-prop" data-id="${p.id}">Copiar link</button>`
     : `<button class="btn btn-primary" data-act="edit-prop" data-id="${p.id}">Editar imóvel</button>
        <button class="btn btn-line" data-act="preview-prop" data-id="${p.id}">Ver como cliente</button>
-       <button class="btn btn-ghost" data-act="share-prop" data-id="${p.id}">Compartilhar</button>
+       <button class="btn btn-ghost" data-act="share-prop" data-id="${p.id}">Copiar link</button>
        <button class="btn btn-danger" data-act="del-prop" data-id="${p.id}">Excluir</button>`;
   return `
     <div class="detail-grid">
@@ -1581,7 +1627,7 @@ function renderPublicProfile(id){
         ${metaHTML(u,props.length)}
         <div class="cover-actions">
           <a class="btn btn-primary" href="${waLink(u,null)}" target="_blank" rel="noopener">Falar no WhatsApp</a>
-          <button class="btn btn-line" data-act="share-profile" data-id="${u.id}">Compartilhar</button>
+          <button class="btn btn-line" data-act="share-profile" data-id="${u.id}">Copiar link</button>
         </div>
       </div>
     </div>
@@ -1719,8 +1765,14 @@ function openPropertyModal(editId){
         <div class="map-frame map-prev" id="mapPrev"></div></div>
       <div class="field"><label>Valor (R$)</label><input class="inp" id="pPrice" type="text" inputmode="numeric" placeholder="R$ 1.250.000" value="${p&&p.price?'R$ '+Number(p.price).toLocaleString('pt-BR'):''}"></div>
       <div class="field"><label>Detalhes <span class="hint">(opcional)</span></label>
-        <div class="row2"><input class="inp" id="pBed" type="text" inputmode="numeric" placeholder="Quartos" value="${p&&p.bedrooms?p.bedrooms:''}"><input class="inp" id="pBath" type="text" inputmode="numeric" placeholder="Banheiros" value="${p&&p.bathrooms?p.bathrooms:''}"></div>
-        <div class="row2" style="margin-top:11px"><input class="inp" id="pPark" type="text" inputmode="numeric" placeholder="Vagas" value="${p&&p.parking?p.parking:''}"><input class="inp" id="pArea" type="text" inputmode="numeric" placeholder="Área (m²)" value="${p&&p.area?p.area:''}"></div>
+        <div class="row2">
+          <div><label class="sublbl">Quartos</label><input class="inp" id="pBed" type="text" inputmode="numeric" value="${p&&p.bedrooms?p.bedrooms:''}"></div>
+          <div><label class="sublbl">Banheiros</label><input class="inp" id="pBath" type="text" inputmode="numeric" value="${p&&p.bathrooms?p.bathrooms:''}"></div>
+        </div>
+        <div class="row2" style="margin-top:11px">
+          <div><label class="sublbl">Vagas</label><input class="inp" id="pPark" type="text" inputmode="numeric" value="${p&&p.parking?p.parking:''}"></div>
+          <div><label class="sublbl">Área (m²)</label><input class="inp" id="pArea" type="text" inputmode="numeric" value="${p&&p.area?p.area:''}"></div>
+        </div>
       </div>
       <div class="field"><label>Descrição <span class="hint">(opcional)</span></label><textarea class="inp" id="pDesc" placeholder="Conte o que torna esse imóvel especial...">${p?esc(p.desc):''}</textarea></div>
       <div class="field"><label class="check ${p&&p.trade?'on':''}" id="tradeCheck" data-act="toggle-trade" style="text-transform:none;letter-spacing:0;font-family:var(--font);font-size:inherit"><span class="box">${I.check}</span><span class="txt"><strong>Aceita permuta</strong><small>Exibe um selo no imóvel</small></span></label></div>
@@ -1811,7 +1863,7 @@ function openProfileModal(){
       <div class="field"><label>Nome completo</label><input class="inp" id="prName" value="${esc(u.name)}"></div>
       <div class="field"><label>Telefone</label><input class="inp" id="prPhone" value="${esc(u.phone)}"></div>
       <div class="rowCreci"><div class="field"><label>CRECI</label><input class="inp" id="prCreci" value="${esc(u.creci)}"></div><div class="field"><label>UF</label><input class="inp" id="prUf" maxlength="2" value="${esc(u.uf)}"></div></div>
-      <div class="field"><label>Região de atuação</label><input class="inp" id="prRegion" value="${esc(u.region)}"></div>
+      <div class="field"><label>Cidade</label><input class="inp" id="prRegion" value="${esc(u.region)}"></div>
       <div class="field"><label>Imobiliária <span class="hint">(opcional)</span></label><input class="inp" id="prAgency" value="${esc(u.agency||'')}"></div>
       <div class="field"><label>Link do seu catálogo <span class="hint">(é o que você envia pro cliente)</span></label>
         <div class="handle-row"><span class="handle-pre mono">/#/</span><input class="inp" id="prHandle" value="${esc(u.handle||'')}" placeholder="seunome" autocapitalize="none" autocomplete="off" spellcheck="false"></div></div>
@@ -1889,12 +1941,14 @@ document.addEventListener('click',e=>{
     case 'card-menu':toggleCardMenu(t.dataset.id);break;
     case 'set-status':closeCardMenus&&closeCardMenus();quickStatus(t.dataset.id,t.dataset.st);break;
     case 'dup-prop':closeCardMenus&&closeCardMenus();dupProp(t.dataset.id);break;
+    case 'move-prop':moveProp(t.dataset.id,Number(t.dataset.d));break;
+    case 'confirm-goto-login':switchAuthTab('login');break;
+    case 'confirm-resend':resendConfirm();break;
     case 'edit-prop':closeCardMenus();openPropertyModal(t.dataset.id);break;
     case 'del-prop':askDelete(t.dataset.id);break;
     case 'confirm-delete':doDelete(t.dataset.id);break;
     case 'share-prop':{const pp=state.properties.find(x=>x.id===t.dataset.id)||{};shareLink('#/i/'+t.dataset.id,pp.name||'Imóvel',pp.name?('Olha esse imóvel que separei pra você: '+pp.name+' por '+BRL(pp.price)):'',OG_URL+'?i='+t.dataset.id);break;}
     case 'share-profile':{const bb=state.brokers.find(x=>x.id===t.dataset.id)||state.user;shareLink(bb&&bb.handle?('#/'+bb.handle):('#/u/'+t.dataset.id),(bb&&bb.name)||'Corretor','Conheça meu catálogo de imóveis:',bb&&bb.handle?(OG_URL+'?u='+encodeURIComponent(bb.handle)):undefined);break;}
-    case 'copy-url':copyUrl();break;
     case 'preview-prop':closeCardMenus();location.hash='#/i/'+t.dataset.id;break;
     case 'preview-profile':{const bb=state.brokers.find(x=>x.id===t.dataset.id)||state.user;location.hash=bb&&bb.handle?('#/'+bb.handle):('#/u/'+t.dataset.id);break;}
     case 'pub-open':location.hash='#/i/'+t.dataset.id;window.scrollTo(0,0);break;
