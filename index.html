@@ -551,7 +551,7 @@ textarea.inp{resize:vertical;min-height:80px;line-height:1.5}
 
 /* ============================ MOTION ============================ */
 .mq{overflow:hidden;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:16px 0;user-select:none}
-.mq-track{display:flex;width:max-content;animation:mqmove 26s linear infinite}
+.mq-track{display:flex;width:max-content;min-width:200vw;animation:mqmove 26s linear infinite}
 .mq:hover .mq-track{animation-play-state:paused}
 .mq-track span{font-family:var(--mono);font-style:normal;font-size:12.5px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-soft);white-space:nowrap}
 .mq-track i{display:inline-block;width:8px;height:8px;background:var(--accent);border-radius:2px;margin:0 26px;vertical-align:middle}
@@ -620,14 +620,15 @@ textarea.inp{resize:vertical;min-height:80px;line-height:1.5}
     <p class="lp-sub">Pare de mandar dezenas de fotos soltas no WhatsApp. Monte um catálogo profissional, compartilhe um link só, e deixe o cliente ver tudo, com fotos, mapa e filtros, e falar com você em um toque.</p>
     <div class="lp-cta">
       <button class="btn btn-primary btn-lg" data-act="go-signup">Criar conta grátis</button>
-      <button class="btn btn-line btn-lg" data-act="lp-demo">Ver um exemplo</button>
     </div>
     <div class="lp-note mono">Grátis para os 3 primeiros imóveis · sem cartão</div>
   </section>
 
   <div class="mq" aria-hidden="true"><div class="mq-track">
-    <span>Casas<i></i>Apartamentos<i></i>Terrenos<i></i>Comercial<i></i>Permuta<i></i>Lançamentos<i></i>Alto padrão<i></i></span>
-    <span>Casas<i></i>Apartamentos<i></i>Terrenos<i></i>Comercial<i></i>Permuta<i></i>Lançamentos<i></i>Alto padrão<i></i></span>
+    <span>Casas<i></i>Apartamentos<i></i>Terrenos<i></i>Comercial<i></i>Permuta<i></i>Lançamentos<i></i></span>
+    <span>Casas<i></i>Apartamentos<i></i>Terrenos<i></i>Comercial<i></i>Permuta<i></i>Lançamentos<i></i></span>
+    <span>Casas<i></i>Apartamentos<i></i>Terrenos<i></i>Comercial<i></i>Permuta<i></i>Lançamentos<i></i></span>
+    <span>Casas<i></i>Apartamentos<i></i>Terrenos<i></i>Comercial<i></i>Permuta<i></i>Lançamentos<i></i></span>
   </div></div>
 
   <section class="lp-section" id="lpOque">
@@ -635,9 +636,9 @@ textarea.inp{resize:vertical;min-height:80px;line-height:1.5}
     <h2 class="lp-h2" data-drift="-55">Seu showroom de imóveis, online.</h2>
     <div class="lp-features">
       <div class="lp-feat reveal" style="transition-delay:0ms"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="1.6"/><path d="m21 15-5-5L5 21"/></svg></div>
-        <h3>Catálogo profissional</h3><p>Cadastre cada imóvel com fotos, descrição, tipo, valor e localização no mapa. Tudo organizado e com a sua cara.</p></div>
+        <h3>Catálogo profissional</h3><p>Cadastre cada imóvel com fotos, descrição, tipo, valor e localização. Tudo organizado e com a sua cara.</p></div>
       <div class="lp-feat reveal" style="transition-delay:90ms"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg></div>
-        <h3>Um link só</h3><p>Compartilhe o catálogo inteiro ou um imóvel específico com um link curto e amigável, fácil de mandar pro cliente.</p></div>
+        <h3>Um link só</h3><p>Compartilhe o catálogo inteiro ou um imóvel específico com um link curto e amigável, fácil de mandar para o seu cliente.</p></div>
       <div class="lp-feat reveal" style="transition-delay:180ms"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M7 12h10M10 18h4"/></svg></div>
         <h3>O cliente encontra rápido</h3><p>Quem recebe o link filtra por tipo, cidade, preço e número de quartos, e fala com você direto no WhatsApp.</p></div>
       <div class="lp-feat reveal" style="transition-delay:270ms"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 6v6c0 5 3.4 8.5 8 10 4.6-1.5 8-5 8-10V6Z"/><path d="m9 12 2 2 4-4"/></svg></div>
@@ -650,14 +651,14 @@ textarea.inp{resize:vertical;min-height:80px;line-height:1.5}
     <h2 class="lp-h2" data-drift="65">Em três passos.</h2>
     <div class="lp-steps">
       <div class="lp-step reveal" style="transition-delay:0ms"><div class="n">01</div><h3>Crie sua conta</h3><p>Cadastro rápido e seu perfil de corretor com nome, CRECI e foto.</p></div>
-      <div class="lp-step reveal" style="transition-delay:120ms"><div class="n">02</div><h3>Cadastre os imóveis</h3><p>Adicione fotos, valor, localização e detalhes. As fotos são otimizadas automaticamente.</p></div>
+      <div class="lp-step reveal" style="transition-delay:120ms"><div class="n">02</div><h3>Cadastre os imóveis</h3><p>Adicione fotos, valor, localização e detalhes.</p></div>
       <div class="lp-step reveal" style="transition-delay:240ms"><div class="n">03</div><h3>Compartilhe o link</h3><p>Envie seu link pro cliente e receba os contatos pelo WhatsApp.</p></div>
     </div>
   </div></section>
 
   <section class="lp-section" id="lpPlanos">
     <div class="lp-eyebrow"><span class="sq"></span>Planos</div>
-    <h2 class="lp-h2" data-drift="-55">Comece grátis. Cresça quando precisar.</h2>
+    <h2 class="lp-h2" data-drift="-55">Comece grátis. <span style="white-space:nowrap">Cresça quando precisar.</span></h2>
     <div class="plans-grid">
       <article class="plan-card reveal" style="transition-delay:0ms"><div class="mono plan-name">Gratuito</div><div class="plan-price">Grátis</div><div class="plan-limit">Até 3 imóveis</div>
         <ul class="plan-feats"><li>Catálogo online</li><li>Link compartilhável</li><li>15 fotos por imóvel</li></ul>
@@ -674,8 +675,10 @@ textarea.inp{resize:vertical;min-height:80px;line-height:1.5}
   </section>
 
   <div class="mq mq-big" aria-hidden="true"><div class="mq-track">
-    <span>Monte sua vitrine<i></i><em>Compartilhe o link</em><i></i>Venda mais<i></i></span>
-    <span>Monte sua vitrine<i></i><em>Compartilhe o link</em><i></i>Venda mais<i></i></span>
+    <span>Monte sua Vitrine<i></i><em>Seu Showroom de Imóveis</em><i></i></span>
+    <span>Monte sua Vitrine<i></i><em>Seu Showroom de Imóveis</em><i></i></span>
+    <span>Monte sua Vitrine<i></i><em>Seu Showroom de Imóveis</em><i></i></span>
+    <span>Monte sua Vitrine<i></i><em>Seu Showroom de Imóveis</em><i></i></span>
   </div></div>
 
   <section class="lp-final">
@@ -1848,7 +1851,6 @@ document.addEventListener('click',e=>{
     case 'go-landing':e.preventDefault();location.hash='';break;
     case 'go-login':e.preventDefault();state.authTab='login';if(location.hash==='#/entrar'){route();}else{location.hash='#/entrar';}break;
     case 'go-signup':e.preventDefault();state.authTab='signup';if(location.hash==='#/entrar'){route();}else{location.hash='#/entrar';}break;
-    case 'lp-demo':location.hash='#/marina';break;
     case 'lp-scroll':{const el=document.getElementById(t.dataset.to);if(el)el.scrollIntoView({behavior:'smooth',block:'start'});break;}
     case 'do-login':doLogin();break;
     case 'do-signup':doSignup();break;
