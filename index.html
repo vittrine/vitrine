@@ -528,15 +528,6 @@ textarea.inp{resize:vertical;min-height:80px;line-height:1.5}
 .topn{width:24px;height:24px;border-radius:50%;background:var(--accent-soft);color:var(--accent-strong);display:grid;place-items:center;font-size:12px;font-weight:700;flex:none}
 .topname{flex:1;font-size:14.5px}
 .topviews{font-size:12px;color:var(--ink-soft)}
-.tour-ov{position:fixed;inset:0;z-index:80;background:rgba(10,10,8,.72);animation:fadein .3s ease}
-.tour-hole{position:absolute;border-radius:10px;box-shadow:0 0 0 9999px rgba(10,10,8,.72);border:2px solid var(--accent);transition:all .35s ease;pointer-events:none}
-.tour-card{position:absolute;width:min(288px,86vw);background:var(--surface);border:1.5px solid var(--accent);border-radius:12px;padding:16px 18px;box-shadow:0 14px 40px rgba(0,0,0,.4);transition:all .35s ease}
-.tour-card strong{font-size:15.5px;display:block;margin-bottom:5px}
-.tour-card p{margin:0;font-size:13.5px;color:var(--ink-soft);line-height:1.5}
-.tour-step{font-size:10px;color:var(--accent-strong);letter-spacing:.1em;margin-bottom:6px}
-.tour-nav{display:flex;justify-content:space-between;align-items:center;margin-top:14px}
-.tour-skip{background:none;border:none;color:var(--ink-faint);cursor:pointer;font:inherit;font-size:13px;text-decoration:underline}
-@keyframes fadein{from{opacity:0}to{opacity:1}}
 .wa-float{position:fixed;right:18px;bottom:18px;z-index:50;display:flex;align-items:center;gap:9px;background:#25D366;color:#fff;padding:13px 18px;border-radius:999px;box-shadow:0 8px 26px rgba(0,0,0,.28);text-decoration:none;font-weight:700;font-size:14px;transition:transform .2s,box-shadow .2s}
 .wa-float:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(0,0,0,.35)}
 .wa-float span{white-space:nowrap}
@@ -1431,42 +1422,6 @@ function renderCatalog(){
     ${props.length>=2?ownerFilterBar():''}
     <div class="grid" id="ownGrid">${props.length?props.map((p,i)=>entryHTML(p,i)).join(''):emptyHTML()}</div>
   </section>`;
-  setTimeout(maybeTour,600);
-}
-function tourKey(){return 'vt_tour_'+((state.user&&state.user.id)||'anon');}
-function maybeTour(){
-  // só na PRIMEIRA vez de cada conta, e nunca para quem já tem imóveis cadastrados
-  try{if(localStorage.getItem(tourKey()))return;}catch(e){}
-  if((state.properties||[]).length>0){try{localStorage.setItem(tourKey(),'1');}catch(e){}return;}
-  // só mostra se o corretor já tem pelo menos o painel montado
-  const steps=[
-    {sel:'[data-act="nav-add"]',title:'Adicione seu primeiro imóvel',text:'Fotos, valor, mapa e até vídeo. Leva uns minutos.'},
-    {sel:'.stat[data-act="nav-leads"]',title:'Seus contatos chegam aqui',text:'Quando um cliente demonstra interesse, o lead aparece nos Leads.'},
-    {sel:'[data-act="nav-edit-profile"]',title:'Seu link para compartilhar',text:'Personalize seu link e mande no WhatsApp, bio do Instagram, placa...'},
-  ].filter(st=>document.querySelector(st.sel));
-  if(!steps.length)return;
-  let i=0;
-  const ov=document.createElement('div');ov.className='tour-ov';document.body.appendChild(ov);
-  function show(){
-    const st=steps[i];const el=document.querySelector(st.sel);
-    if(!el){next();return;}
-    const r=el.getBoundingClientRect();
-    el.scrollIntoView({block:'center',behavior:'smooth'});
-    setTimeout(()=>{
-      const rr=el.getBoundingClientRect();
-      ov.innerHTML=`<div class="tour-hole" style="top:${rr.top-6}px;left:${rr.left-6}px;width:${rr.width+12}px;height:${rr.height+12}px"></div>
-        <div class="tour-card" style="top:${Math.min(window.innerHeight-180,rr.bottom+14)}px;left:${Math.max(14,Math.min(window.innerWidth-300,rr.left))}px">
-          <div class="tour-step mono">${i+1} de ${steps.length}</div>
-          <strong>${st.title}</strong><p>${st.text}</p>
-          <div class="tour-nav"><button class="tour-skip" data-tour="skip">Pular</button><button class="btn btn-primary" data-tour="next" style="padding:8px 16px">${i===steps.length-1?'Entendi!':'Próximo'}</button></div>
-        </div>`;
-    },350);
-  }
-  function next(){i++;if(i>=steps.length)finish();else show();}
-  function finish(){ov.remove();try{localStorage.setItem(tourKey(),'1');}catch(e){}}
-  ov.addEventListener('click',e=>{const a=e.target.closest('[data-tour]');if(!a)return;
-    if(a.dataset.tour==='skip')finish();else next();});
-  show();
 }
 function statsHTML(props){
   const views=props.reduce((a,p)=>a+(p.views||0),0);
