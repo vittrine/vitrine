@@ -682,11 +682,11 @@ textarea.inp{resize:vertical;min-height:80px;line-height:1.5}
     <h2 class="lp-h2" data-drift="-55">Comece grátis. <span style="white-space:nowrap">Cresça quando precisar.</span></h2>
     <div class="plans-grid">
       <article class="plan-card reveal" style="transition-delay:0ms"><div class="mono plan-name">Gratuito</div><div class="plan-price">Grátis</div><div class="plan-limit">Até 3 imóveis</div>
-        <ul class="plan-feats"><li>Catálogo online</li><li>Link compartilhável</li><li>15 fotos por imóvel</li></ul>
+        <ul class="plan-feats"><li>Catálogo online</li><li>Link compartilhável</li><li>10 fotos por imóvel</li></ul>
         <button class="btn btn-line btn-block" data-act="go-signup">Começar grátis</button></article>
       <article class="plan-card popular reveal" style="transition-delay:120ms"><div class="plan-tag mono">Mais popular</div><div class="mono plan-name">Profissional</div>
         <div class="plan-price"><span class="cur">R$</span>32<span class="cents">,90</span><span class="per">/mês</span></div><div class="plan-limit">Até 15 imóveis</div>
-        <ul class="plan-feats"><li>Catálogo online</li><li>Link compartilhável</li><li>1 vídeo + 30 fotos por imóvel</li></ul>
+        <ul class="plan-feats"><li>Catálogo online</li><li>Link compartilhável</li><li>1 vídeo + 20 fotos por imóvel</li></ul>
         <button class="btn btn-primary btn-block" data-act="go-signup">Assinar</button></article>
       <article class="plan-card reveal" style="transition-delay:240ms"><div class="mono plan-name">Ilimitado</div>
         <div class="plan-price"><span class="cur">R$</span>49<span class="cents">,90</span><span class="per">/mês</span></div><div class="plan-limit">Imóveis ilimitados</div>
@@ -931,8 +931,8 @@ function loadingHTML(){return '<div style="padding:90px 20px;text-align:center" 
 
 /* ===================== PLANS ===================== */
 const PLANS=[
-  {id:'free',name:'Gratuito',price:0,limit:3,photos:15,feats:['Até 3 imóveis','Catálogo online','Link compartilhável','15 fotos por imóvel']},
-  {id:'pro15',name:'Profissional',price:32.9,limit:15,photos:30,popular:true,feats:['Até 15 imóveis','Catálogo online','Link compartilhável','1 vídeo + 30 fotos por imóvel']},
+  {id:'free',name:'Gratuito',price:0,limit:3,photos:10,feats:['Até 3 imóveis','Catálogo online','Link compartilhável','10 fotos por imóvel']},
+  {id:'pro15',name:'Profissional',price:32.9,limit:15,photos:20,popular:true,feats:['Até 15 imóveis','Catálogo online','Link compartilhável','1 vídeo + 20 fotos por imóvel']},
   {id:'unlimited',name:'Ilimitado',price:49.9,limit:Infinity,photos:Infinity,feats:['Imóveis ilimitados','Catálogo online','Link compartilhável','Vídeos e fotos ilimitados','Suporte']},
 ];
 function planOf(u){const id=(u&&u.plan)||'free';
@@ -1132,7 +1132,7 @@ function planCard(p,u){
   const price=p.price?`<span class="cur">R$</span>${p.price.toFixed(2).replace('.',',').split(',')[0]}<span class="cents">,${p.price.toFixed(2).split('.')[1]}</span><span class="per">/mês</span>`:'Grátis';
   const tag=isCur?'<div class="plan-tag cur-tag mono">Seu plano</div>':(p.popular?'<div class="plan-tag mono">Mais popular</div>':'');
   const btn=isCur?`<button class="btn btn-ghost btn-block" disabled style="opacity:.65">Plano atual</button>`
-    :(p.price?`<button class="btn ${p.popular?'btn-primary':'btn-line'} btn-block" data-act="sub-card" data-id="${p.id}">Assinar no cartão · renova sozinho</button>
+    :(p.price?`<button class="btn ${p.popular?'btn-primary':'btn-line'} btn-block" data-act="sub-card" data-id="${p.id}">Assinar com cartão de crédito · Renovação automática</button>
        <button class="btn btn-ghost btn-block" data-act="choose-plan" data-id="${p.id}" style="margin-top:8px">Pagar 1 mês no Pix</button>`
       :`<button class="btn btn-line btn-block" data-act="choose-plan" data-id="${p.id}">Usar gratuito</button>`);
   return `<article class="plan-card reveal ${isCur?'current':''} ${p.popular?'popular':''}">
@@ -1156,7 +1156,7 @@ async function subCard(id){
     if(data.subId){state.user.sub_id=data.subId;cacheBroker(state.user);}
     location.href=data.url;
   }catch(err){console.error(err);}
-  if(btn){btn.disabled=false;btn.textContent='Assinar no cartão · renova sozinho';}
+  if(btn){btn.disabled=false;btn.textContent='Assinar com cartão de crédito · Renovação automática';}
 }
 function subCancelModal(){
   openModal(`<div class="modal-head"><h3>Cancelar renovação</h3><button class="icon-btn" data-act="close-modal" style="width:34px;height:34px" aria-label="Fechar">✕</button></div>
@@ -1433,8 +1433,11 @@ function renderCatalog(){
   </section>`;
   setTimeout(maybeTour,600);
 }
+function tourKey(){return 'vt_tour_'+((state.user&&state.user.id)||'anon');}
 function maybeTour(){
-  try{if(sessionStorage.getItem('vt_tour'))return;}catch(e){}
+  // só na PRIMEIRA vez de cada conta, e nunca para quem já tem imóveis cadastrados
+  try{if(localStorage.getItem(tourKey()))return;}catch(e){}
+  if((state.properties||[]).length>0){try{localStorage.setItem(tourKey(),'1');}catch(e){}return;}
   // só mostra se o corretor já tem pelo menos o painel montado
   const steps=[
     {sel:'[data-act="nav-add"]',title:'Adicione seu primeiro imóvel',text:'Fotos, valor, mapa e até vídeo. Leva uns minutos.'},
@@ -1460,7 +1463,7 @@ function maybeTour(){
     },350);
   }
   function next(){i++;if(i>=steps.length)finish();else show();}
-  function finish(){ov.remove();try{sessionStorage.setItem('vt_tour','1');}catch(e){}}
+  function finish(){ov.remove();try{localStorage.setItem(tourKey(),'1');}catch(e){}}
   ov.addEventListener('click',e=>{const a=e.target.closest('[data-tour]');if(!a)return;
     if(a.dataset.tour==='skip')finish();else next();});
   show();
@@ -1569,8 +1572,7 @@ function detailBody(p,u,isPublic){
   const photos=(p.gallery&&p.gallery.length)?p.gallery:[p.cover];
   const cta=isPublic
     ? `<a class="btn btn-primary" style="flex:1;justify-content:center;min-width:170px" href="${waLink(u,p)}" target="_blank" rel="noopener">Falar no WhatsApp</a>
-       <button class="btn btn-line" data-act="lead-open" data-id="${p.id}">Tenho interesse</button>
-       <button class="btn btn-ghost" data-act="share-prop" data-id="${p.id}">Copiar link</button>`
+       <button class="btn btn-line" data-act="lead-open" data-id="${p.id}">Tenho interesse</button>`
     : `<button class="btn btn-primary" data-act="edit-prop" data-id="${p.id}">Editar imóvel</button>
        <button class="btn btn-line" data-act="preview-prop" data-id="${p.id}">Ver como cliente</button>
        <button class="btn btn-ghost" data-act="share-prop" data-id="${p.id}">Copiar link</button>
@@ -1635,7 +1637,6 @@ function renderPublicProfile(id){
         ${metaHTML(u,props.length)}
         <div class="cover-actions">
           <a class="btn btn-primary" href="${waLink(u,null)}" target="_blank" rel="noopener">Falar no WhatsApp</a>
-          <button class="btn btn-line" data-act="share-profile" data-id="${u.id}">Copiar link</button>
         </div>
       </div>
     </div>
@@ -1824,7 +1825,7 @@ function openPropertyModal(editId){
     <div class="modal-foot"><button class="btn btn-ghost" data-act="close-modal">Cancelar</button><button class="btn btn-primary" data-act="save-property" data-edit="${editId||''}">${p?'Salvar':'Adicionar'}</button></div>`);
   $('#coverInput').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;formBuf.cover=f;$('#coverPrev').innerHTML=`<img class="cover-prev" src="${URL.createObjectURL(f)}">`;});
   $('#galInput').addEventListener('change',e=>{
-    const lim=(state.user&&planOf(state.user).photos)||15;
+    const lim=(state.user&&planOf(state.user).photos)||10;
     [...e.target.files].forEach(f=>formBuf.gallery.push(f));
     if(formBuf.gallery.length>lim){formBuf.gallery=formBuf.gallery.slice(0,lim);toast(`Seu plano permite até ${lim} fotos por imóvel.`,false);}
     $('#galThumbs').innerHTML=galThumbsHTML();});
