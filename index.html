@@ -878,8 +878,10 @@ function propToRow(p){return {ref:p.ref,name:p.name,street:p.street,neighborhood
 function cacheBroker(b){if(!b)return;const i=state.brokers.findIndex(x=>x.id===b.id);if(i>=0)state.brokers[i]=b;else state.brokers.push(b);}
 function putProp(p){const i=state.properties.findIndex(x=>x.id===p.id);if(i>=0)state.properties[i]=p;else state.properties.push(p);}
 async function fetchBroker(id){
-  // dados completos só do próprio corretor logado; de terceiros, só o que é público
-  const own=state.user&&state.user.id===id;
+  // dados completos só do próprio corretor logado; de terceiros, só o que é público.
+  // a checagem usa a SESSÃO (state.user ainda está vazio quando o app abre)
+  let own=!!(state.user&&state.user.id===id);
+  if(!own){try{const {data:{session}}=await sb.auth.getSession();own=!!(session&&session.user&&session.user.id===id);}catch(e){}}
   const {data,error}=await sb.from(own?'brokers':'brokers_public').select('*').eq('id',id).maybeSingle();
   if(error)console.error(error);if(data)cacheBroker(data);return data;}
 async function fetchProps(brokerId){const {data,error}=await sb.from('properties').select('*').eq('broker',brokerId).order('pos',{ascending:true,nullsFirst:false}).order('created_at',{ascending:false});
@@ -1995,7 +1997,14 @@ async function init(){
     const {data:{session}}=await sb.auth.getSession();
     if(session&&session.user){
       const b=await fetchBroker(session.user.id);
-      if(b){state.user=b;state.theme=b.theme||'light';state.accent=b.accent||'cobalt';await ensureHandle();}
+      if(b){state.user=b;state.theme=b.theme||'light';state.accent=b.accent||'cobalt';await ensureHandle();
+        // volta do checkout: confere o plano mais atual direto na fonte
+        sb.from('brokers').select('plan,paid_until,sub_id').eq('id',b.id).maybeSingle()
+          .then(({data:f})=>{if(f&&state.user){const mudou=f.plan!==state.user.plan;
+            Object.assign(state.user,f);
+            if(mudou&&state.route!=='plans'&&f.plan!=='free')toast(`Plano ${planOf(state.user).name} ativo!`);
+            if(state.route==='plans')renderPlans();}});
+      }
     }
   }catch(e){console.error(e);}
   route();
