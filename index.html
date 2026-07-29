@@ -1434,7 +1434,7 @@ function statsHTML(props){
     <div class="stat"><div class="sv">${props.length}</div><div class="sl mono">${props.length===1?'Imóvel':'Imóveis'}<small>${disp} ${disp===1?'disponível':'disponíveis'}</small></div></div>
     <div class="stat" id="statViews"><div class="sv">${views}</div><div class="sl mono">Visualizações<small>no catálogo todo</small></div></div>
     <div class="stat" data-act="nav-leads" style="cursor:pointer"><div class="sv">${leads}</div><div class="sl mono">Leads<small>toque para abrir</small></div></div>
-    <div class="stat" data-act="nav-plans" style="cursor:pointer"><div class="sv" style="font-size:19px;padding-top:5px">${cur.name}</div><div class="sl mono">Plano<small>${cur.id!=='free'&&state.user.paid_until?'até '+new Date(state.user.paid_until).toLocaleDateString('pt-BR'):'gratuito'}</small></div></div>
+    <div class="stat" data-act="nav-plans" style="cursor:pointer"><div class="sv" style="font-size:19px;padding-top:5px">${cur.name}</div><div class="sl mono">Plano<small>toque para ver</small></div></div>
   </div>`;
 }
 function renderViewsSpark(events){
@@ -1878,7 +1878,16 @@ document.addEventListener('click',e=>{
     case 'forgot-pass':forgotPassModal();break;
     case 'send-reset':sendReset();break;
     case 'save-newpass':saveNewPass();break;
-    case 'go-landing':e.preventDefault();if(location.hash==='#/inicio')route();else location.hash='#/inicio';break;
+    case 'go-landing':e.preventDefault();
+      if(state.user){ // logado: volta para o próprio painel
+        state.route='catalog';state.currentId=null;
+        if(location.hash){location.hash='';}
+        else{showSection('app');applyTheme();loadOwner();}
+        window.scrollTo({top:0,behavior:'smooth'});
+      }else{ // visitante: página inicial
+        if(location.hash==='#/inicio')route();else location.hash='#/inicio';
+      }
+      break;
     case 'go-login':e.preventDefault();state.authTab='login';if(location.hash==='#/entrar'){route();}else{location.hash='#/entrar';}break;
     case 'go-signup':e.preventDefault();state.authTab='signup';if(location.hash==='#/entrar'){route();}else{location.hash='#/entrar';}break;
     case 'lp-scroll':{const el=document.getElementById(t.dataset.to);if(el)el.scrollIntoView({behavior:'smooth',block:'start'});break;}
